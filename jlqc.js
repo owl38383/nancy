@@ -66,7 +66,7 @@ let message = []
 async function getLogin() {
     try {
         request('get', 'https://app.geely.com/api/v1/user/isLogin').then(res => {
-            return res.code = 'success'
+            return res.code === 'success'
         })
     } catch (error) {
         console.error(error)
@@ -79,9 +79,9 @@ async function get_sign() {
     try {
         request('get', 'https://app.geely.com/my/getMyCenterCounts').then(res => {
             if (res.data.isSign) {
-                console.log(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
+                message.push(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
             } else {
-                console.log('开始签到')
+                message.push('开始签到')
                 sign_in()
             }
             sing_msg()
@@ -101,8 +101,8 @@ async function re_sign() {
         }
     })
         .then(json => {
-            console.log(`签到 ${json.message}`)
-            return json.code = 'success'
+            message.push(`签到 ${json.message}`)
+            return json.code === 'success'
         })
         .catch(e => {
         })
@@ -117,11 +117,11 @@ async function sign_in() {
         }
     })
         .then(json => {
-            console.log(`签到 ${json.message}`)
-            return json.code = 'success'
+            message.push(`签到 ${json.message}`)
+            return json.code === 'success'
         })
         .catch(e => {
-            console.log(`签到失败`)
+            message.push(`签到失败`)
         })
 }
 
@@ -134,9 +134,9 @@ async function sing_msg() {
     })
         .then(json => {
             if (json.code == 'success') {
-                console.log(`${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天， 连续签到 ${json.data.continuousSignDay} 天`)
+                message.push(`${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天， 连续签到 ${json.data.continuousSignDay} 天`)
             }
-            return json.code = 'success'
+            return json.code === 'success'
         })
         .catch(e => {
         })
@@ -152,35 +152,34 @@ async function show_msg() {
     let availablePoint = total = privilegeNum = 0
     await request('get', available, {})
         .then(json => {
-            if (json.code == 'success') {
+            if (json.code === 'success') {
                 availablePoint = json.data.availablePoint
             }
-            return json.code = 'success'
+            return json.code === 'success'
         })
         .catch(e => {
         })
 
     await request('get', summary, {})
         .then(json => {
-            if (json.code == 'success') {
+            if (json.code === 'success') {
                 total = json.data.total
             }
-            return json.code = 'success'
+            return json.code === 'success'
         })
         .catch(e => {
         })
 
     await request('get', getMemberLevelInfo, {})
         .then(json => {
-            if (json.code == 'success') {
+            if (json.code === 'success') {
                 privilegeNum = json.data.privilegeNum
             }
-            return json.code = 'success'
+            return json.code === 'success'
         })
         .catch(e => {
         })
-
-    console.log(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
+    message.push(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
 }
 
 async function create_topic() {
@@ -193,12 +192,11 @@ async function create_topic() {
         'contentType': 1
     }).then(async res => {
         let id = res.data
-        console.log(`发布成功 ${res.data}`)
-
+        message.push(`发布成功 ${res.data}`)
         await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
             'id': id
         }).then(res => {
-            console.log(`删除成功 ${id}`)
+            message.push(`删除成功 ${id}`)
         })
     })
 }
