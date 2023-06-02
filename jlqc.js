@@ -5,9 +5,7 @@ cron "0 9 * * *" jlqc.js, tag:吉利汽车签到
 //详细说明参考 https://github.com/ccwav/QLScript2.
 
 const axios = require('axios')
-const {sendNotify} = require("./sendNotify");
 const $ = new Env('吉利汽车签到')
-const notify = $.isNode() ? require('./sendNotify') : ''
 
 const Notify = 1; //0为关闭通知，1为打开通知,默认为1
 const debug = 0; //0为关闭调试，1为打开调试,默认为0
@@ -15,17 +13,15 @@ const debug = 0; //0为关闭调试，1为打开调试,默认为0
 let envName = 'jlqcCookies'
 let _cookies = ($.isNode() ? process.env[envName] : $.getdata(`${envName}`)) || ''
 let _cookiesArr = []
-let message = []
 !(async () => {
 
     if (!(await Envs())) return  //多账号分割 判断变量是否为空  初步处理多账号
     else {
-        console.log(`\n\n=========================================    脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========================================\n`)
-        console.log(`=================== 共找到 ${_cookiesArr.length} 个账号 ===================`)
+        $.log(`\n\n=========================================    脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========================================\n`)
+        $.log(`=================== 共找到 ${_cookiesArr.length} 个账号 ===================`)
         for (let index = 0; index < _cookiesArr.length; index++) {
             let num = index + 1
-            console.log(`========= 开始【第 ${num} 个账号】=========`)
-            message.push(`========= 开始【第 ${num} 个账号】=========`)
+            $.log(`========= 开始【第 ${num} 个账号】=========`)
             // msg += ` 【第 ${num} 个账号】`
             let ck = _cookiesArr[index]
             let headers = {
@@ -40,7 +36,7 @@ let message = []
             }
 
             if (debug) {
-                console.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}`);
+                $.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}`);
             }
             axios.defaults.headers = headers;
             // 签到任务
@@ -51,12 +47,10 @@ let message = []
                 await create_topic()
                 await show_msg()
             }else{
-                console.log(`账号${index}已失效`)
-                message.push(`账号${index}已失效`)
+                $.log(`账号${index}已失效`)
 
             }
-            await SendMsg(message)
-
+            await SendMsg($.logs)
         }
     }
 
@@ -74,16 +68,13 @@ async function getLogin() {
     }
     return false
 }
-
-
 async function get_sign() {
     try {
         const res = await request('get', 'https://app.geely.com/my/getMyCenterCounts')
         if (res.data.isSign) {
-            message.push(`今日已签到 跳过 \n 签到时间 ${res.data.signTime}`)
-            console.log(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
+            $.log(`今日已签到 跳过 \n 签到时间 ${res.data.signTime}`)
         } else {
-            console.log('开始签到')
+            $.log('开始签到')
             await sign_in()
         }
         await sing_msg()
@@ -91,7 +82,6 @@ async function get_sign() {
         console.error(error)
     }
 }
-
 async function re_sign() {
     request('post', 'https://app.geely.com/api/v1/userSign/reSign', {
         data: {
@@ -102,13 +92,12 @@ async function re_sign() {
         }
     })
         .then(json => {
-            console.log(`签到 ${json.message}`)
+            $.log(`签到 ${json.message}`)
             return json.code === 'success'
         })
         .catch(e => {
         })
 }
-
 async function sign_in() {
     request('post', 'https://app.geely.com/api/v1/userSign/sign', {
         data: {
@@ -118,14 +107,13 @@ async function sign_in() {
         }
     })
         .then(json => {
-            console.log(`签到 ${json.message}`)
+            $.log(`签到 ${json.message}`)
             return json.code === 'success'
         })
         .catch(e => {
-            console.log(`签到失败`)
+            $.log(`签到失败`)
         })
 }
-
 async function sing_msg() {
     request('post', 'https://app.geely.com/api/v1/userSign/getSignMsg', {
         data: {
@@ -136,15 +124,13 @@ async function sing_msg() {
         .then(json => {
             if (json.code == 'success') {
                 let log = `${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天 `
-                message.push(log)
-                console.log(log)
+                $.log(log)
             }
             return json.code === 'success'
         })
         .catch(e => {
         })
 }
-
 async function show_msg() {
     const available = 'https://app.geely.com/api/v1/point/available'
     const summary = 'https://app.geely.com/api/v1/growthSystem/energyBody/summary'
@@ -182,10 +168,9 @@ async function show_msg() {
         })
         .catch(e => {
         })
-    message.push(`账户统计 \n吉分：${availablePoint} 能量体 ${total} 当前等级${privilegeNum}`)
-    console.log(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
+    $.log(`账户统计 \n吉分：${availablePoint} 能量体 ${total} 当前等级${privilegeNum}`)
+    $.log(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
 }
-
 async function create_topic() {
     let _message = '每日一句话'
     const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
@@ -196,16 +181,15 @@ async function create_topic() {
         'contentType': 1
     }).then(async res => {
         let id = res.data
-        console.log(`发布成功 ${res.data}`)
+        $.log(`发布成功 ${res.data}`)
         // await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
         //     'id': id
         // }).then(res => {
-        //     console.log(`删除成功 ${id}`)
+        //     $.log(`删除成功 ${id}`)
         // })
-        message.push(`文章发布成功`)
+        $.log(`文章发布成功`)
     })
 }
-
 async function request(method, url, data) {
     return new Promise(async (resolve, reject) => {
         try {
@@ -253,6 +237,7 @@ Date.prototype.Format = function (fmt) {
     }
     return d
 }
+
 //#region 固定代码
 // ============================================变量检查============================================ \\
 async function Envs() {
@@ -262,10 +247,11 @@ async function Envs() {
             _cookiesArr = _cookies.split('&')
         else if (_cookies.indexOf('\n') > -1)
             _cookiesArr = _cookies.split('\n')
+        else if (_cookies.indexOf('@') > -1)
+            _cookiesArr = _cookies.split('@')
         else _cookiesArr = [_cookies]
     } else {
-        console.log(` 【${$.name}】：未填写变量 ${envName}`)
-        message.push(`【${$.name}】：未填写变量 ${envName}`)
+        $.log(`【${$.name}】：未填写变量 ${envName}`)
         return
     }
 
@@ -276,12 +262,12 @@ async function Envs() {
 async function SendMsg(message) {
     if (!message)
         return
-    message = message.join("\n")
     if (Notify > 0) {
         if ($.isNode()) {
             var notify = require('./sendNotify')
             await notify.sendNotify($.name, message)
         } else {
+            $.msg(message)
             console.log(message)
         }
     } else {
