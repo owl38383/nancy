@@ -24,7 +24,8 @@ let message = []
         console.log(`\n=================== 共找到 ${_cookiesArr.length} 个账号 ===================`)
         for (let index = 0; index < _cookiesArr.length; index++) {
             let num = index + 1
-            await SendMsg(`\n========= 开始【第 ${num} 个账号】=========\n`)
+            console.log(`\n========= 开始【第 ${num} 个账号】=========\n`)
+            message.push(`\n========= 开始【第 ${num} 个账号】=========\n`)
             // msg += `\n 【第 ${num} 个账号】`
             let ck = _cookiesArr[index]
             let headers = {
@@ -50,7 +51,9 @@ let message = []
                 await create_topic()
                 await show_msg()
             }else{
-                await SendMsg(`账号${index}已失效`)
+                console.log(`账号${index}已失效`)
+                message.push(`账号${index}已失效\n`)
+
             }
             await SendMsg(message)
 
@@ -77,9 +80,10 @@ async function get_sign() {
     try {
         const res = await request('get', 'https://app.geely.com/my/getMyCenterCounts')
         if (res.data.isSign) {
-            await SendMsg(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
+            message.push(`今日已签到 跳过 签到时间 ${res.data.signTime}\n`)
+            console.log(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
         } else {
-            await SendMsg('开始签到')
+            console.log('开始签到')
             await sign_in()
         }
         await sing_msg()
@@ -97,8 +101,8 @@ async function re_sign() {
             'resignCardId': 24448
         }
     })
-        .then(async json => {
-            await SendMsg(`签到 ${json.message}`)
+        .then(json => {
+            console.log(`签到 ${json.message}`)
             return json.code === 'success'
         })
         .catch(e => {
@@ -113,12 +117,12 @@ async function sign_in() {
             'cId': 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
         }
     })
-        .then(async json => {
-            await SendMsg(`签到 ${json.message}`)
+        .then(json => {
+            console.log(`签到 ${json.message}`)
             return json.code === 'success'
         })
-        .catch(async e => {
-            await SendMsg(`签到失败`)
+        .catch(e => {
+            console.log(`签到失败`)
         })
 }
 
@@ -129,9 +133,11 @@ async function sing_msg() {
             'month': new Date().getUTCMonth() + 1
         }
     })
-        .then(async json => {
+        .then(json => {
             if (json.code == 'success') {
-                await SendMsg(`${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天， 连续签到 ${json.data.continuousSignDay} 天`)
+                let log = `${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天， 连续签到 ${json.data.continuousSignDay} 天\n`
+                message.push(log)
+                console.log(log)
             }
             return json.code === 'success'
         })
@@ -176,7 +182,8 @@ async function show_msg() {
         })
         .catch(e => {
         })
-    await SendMsg(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
+    message.push(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}\n`)
+    console.log(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
 }
 
 async function create_topic() {
@@ -189,12 +196,13 @@ async function create_topic() {
         'contentType': 1
     }).then(async res => {
         let id = res.data
-        await SendMsg(`发布成功 ${res.data}`)
-        await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
-            'id': id
-        }).then(async res => {
-            await SendMsg(`删除成功 ${id}`)
-        })
+        console.log(`发布成功 ${res.data}`)
+        // await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
+        //     'id': id
+        // }).then(res => {
+        //     console.log(`删除成功 ${id}`)
+        // })
+        message.push(`文章发布成功 \n`)
     })
 }
 
@@ -257,6 +265,7 @@ async function Envs() {
         else _cookiesArr = [_cookies]
     } else {
         console.log(`\n 【${$.name}】：未填写变量 ${envName}`)
+        message.push(`\n 【${$.name}】：未填写变量 ${envName}`)
         return
     }
 
@@ -267,13 +276,13 @@ async function Envs() {
 async function SendMsg(message) {
     if (!message)
         return
-    
+
     if (Notify > 0) {
         if ($.isNode()) {
             var notify = require('./sendNotify')
             await notify.sendNotify($.name, message)
         } else {
-            $.msg(message)
+            console.log(message)
         }
     } else {
         console.log(message)
