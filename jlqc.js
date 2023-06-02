@@ -1,5 +1,5 @@
 /*
-cron "0 21 * * *" jd_bean_change.js, tag:资产变化强化版by-ccwav
+cron "0 9 * * *" jlqc.js, tag:吉利汽车签到
  */
 
 //详细说明参考 https://github.com/ccwav/QLScript2.
