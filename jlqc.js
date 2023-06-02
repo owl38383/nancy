@@ -24,7 +24,7 @@ let message = []
         console.log(`\n=================== 共找到 ${_cookiesArr.length} 个账号 ===================`)
         for (let index = 0; index < _cookiesArr.length; index++) {
             let num = index + 1
-            message.push(`\n========= 开始【第 ${num} 个账号】=========\n`)
+            await SendMsg(`\n========= 开始【第 ${num} 个账号】=========\n`)
             // msg += `\n 【第 ${num} 个账号】`
             let ck = _cookiesArr[index]
             let headers = {
@@ -50,7 +50,7 @@ let message = []
                 await create_topic()
                 await show_msg()
             }else{
-                message.push(`账号${index}已失效`)
+                await SendMsg(`账号${index}已失效`)
             }
             await SendMsg(message)
 
@@ -77,9 +77,9 @@ async function get_sign() {
     try {
         const res = await request('get', 'https://app.geely.com/my/getMyCenterCounts')
         if (res.data.isSign) {
-            message.push(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
+            await SendMsg(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
         } else {
-            message.push('开始签到')
+            await SendMsg('开始签到')
             await sign_in()
         }
         await sing_msg()
@@ -98,7 +98,7 @@ async function re_sign() {
         }
     })
         .then(json => {
-            message.push(`签到 ${json.message}`)
+            await SendMsg(`签到 ${json.message}`)
             return json.code === 'success'
         })
         .catch(e => {
@@ -114,11 +114,11 @@ async function sign_in() {
         }
     })
         .then(json => {
-            message.push(`签到 ${json.message}`)
+            await SendMsg(`签到 ${json.message}`)
             return json.code === 'success'
         })
         .catch(e => {
-            message.push(`签到失败`)
+            await SendMsg(`签到失败`)
         })
 }
 
@@ -131,7 +131,7 @@ async function sing_msg() {
     })
         .then(json => {
             if (json.code == 'success') {
-                message.push(`${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天， 连续签到 ${json.data.continuousSignDay} 天`)
+                await SendMsg(`${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天， 连续签到 ${json.data.continuousSignDay} 天`)
             }
             return json.code === 'success'
         })
@@ -176,7 +176,7 @@ async function show_msg() {
         })
         .catch(e => {
         })
-    message.push(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
+    await SendMsg(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
 }
 
 async function create_topic() {
@@ -189,11 +189,11 @@ async function create_topic() {
         'contentType': 1
     }).then(async res => {
         let id = res.data
-        message.push(`发布成功 ${res.data}`)
+        await SendMsg(`发布成功 ${res.data}`)
         await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
             'id': id
         }).then(res => {
-            message.push(`删除成功 ${id}`)
+            await SendMsg(`删除成功 ${id}`)
         })
     })
 }
@@ -267,7 +267,7 @@ async function Envs() {
 async function SendMsg(message) {
     if (!message)
         return
-
+    
     if (Notify > 0) {
         if ($.isNode()) {
             var notify = require('./sendNotify')
