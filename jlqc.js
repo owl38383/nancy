@@ -180,12 +180,12 @@ async function show_msg() {
 }
 
 async function create_topic() {
-    let message = '每日一句话'
+    let _message = '每日一句话'
     const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
-    message = res.data
+    _message = res.data
 
     await request('post', 'https://app.geely.com/api/v2/topicContent/create', {
-        'content': message,
+        'content': _message,
         'contentType': 1
     }).then(async res => {
         let id = res.data
