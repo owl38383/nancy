@@ -156,7 +156,7 @@ async function show_msg() {
     await request('get', available, {})
         .then(json => {
             if (json.code === 'success') {
-                availablePoint = json.data.availablePoint.parseInt()
+                availablePoint = json.data.availablePoint
             }
             return json.code === 'success'
         })
@@ -166,7 +166,7 @@ async function show_msg() {
     await request('get', summary, {})
         .then(json => {
             if (json.code === 'success') {
-                total = json.data.total.parseInt()
+                total = json.data.total
             }
             return json.code === 'success'
         })
@@ -176,7 +176,7 @@ async function show_msg() {
     await request('get', getMemberLevelInfo, {})
         .then(json => {
             if (json.code === 'success') {
-                privilegeNum = json.data.privilegeNum.parseInt()
+                privilegeNum = json.data.privilegeNum
             }
             return json.code === 'success'
         })
