@@ -24,7 +24,7 @@ let message = []
         console.log(`\n=================== 共找到 ${_cookiesArr.length} 个账号 ===================`)
         for (let index = 0; index < _cookiesArr.length; index++) {
             let num = index + 1
-            console.log(`\n========= 开始【第 ${num} 个账号】=========\n`)
+            message.push(`\n========= 开始【第 ${num} 个账号】=========\n`)
             // msg += `\n 【第 ${num} 个账号】`
             let ck = _cookiesArr[index]
             let headers = {
@@ -43,7 +43,6 @@ let message = []
             }
             axios.defaults.headers = headers;
             // 签到任务
-            message.push(`【账号${index}】`)
             let login = await getLogin();
             if (login){
                 await get_sign()
@@ -65,9 +64,8 @@ let message = []
 
 async function getLogin() {
     try {
-        request('get', 'https://app.geely.com/api/v1/user/isLogin').then(res => {
-            return res.code === 'success'
-        })
+        let res = await request('get', 'https://app.geely.com/api/v1/user/isLogin');
+        return res.code === 'success'
     } catch (error) {
         console.error(error)
     }
@@ -77,15 +75,14 @@ async function getLogin() {
 
 async function get_sign() {
     try {
-        request('get', 'https://app.geely.com/my/getMyCenterCounts').then(res => {
-            if (res.data.isSign) {
-                message.push(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
-            } else {
-                message.push('开始签到')
-                sign_in()
-            }
-            sing_msg()
-        })
+        const res = request('get', 'https://app.geely.com/my/getMyCenterCounts')
+        if (res.data.isSign) {
+            message.push(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
+        } else {
+            message.push('开始签到')
+            await sign_in()
+        }
+        await sing_msg()
     } catch (error) {
         console.error(error)
     }
