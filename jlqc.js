@@ -21,12 +21,12 @@ let message = []
     if (!(await Envs())) return  //多账号分割 判断变量是否为空  初步处理多账号
     else {
         console.log(`\n\n=========================================    脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========================================\n`)
-        console.log(`\n=================== 共找到 ${_cookiesArr.length} 个账号 ===================`)
+        console.log(`=================== 共找到 ${_cookiesArr.length} 个账号 ===================`)
         for (let index = 0; index < _cookiesArr.length; index++) {
             let num = index + 1
-            console.log(`\n========= 开始【第 ${num} 个账号】=========\n`)
-            message.push(`\n========= 开始【第 ${num} 个账号】=========\n`)
-            // msg += `\n 【第 ${num} 个账号】`
+            console.log(`========= 开始【第 ${num} 个账号】=========`)
+            message.push(`========= 开始【第 ${num} 个账号】=========`)
+            // msg += ` 【第 ${num} 个账号】`
             let ck = _cookiesArr[index]
             let headers = {
                 'Accept': '*/*',
@@ -40,7 +40,7 @@ let message = []
             }
 
             if (debug) {
-                console.log(`\n 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}\n`);
+                console.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}`);
             }
             axios.defaults.headers = headers;
             // 签到任务
@@ -52,7 +52,7 @@ let message = []
                 await show_msg()
             }else{
                 console.log(`账号${index}已失效`)
-                message.push(`\n账号${index}已失效\n`)
+                message.push(`账号${index}已失效`)
 
             }
             await SendMsg(message)
@@ -80,7 +80,7 @@ async function get_sign() {
     try {
         const res = await request('get', 'https://app.geely.com/my/getMyCenterCounts')
         if (res.data.isSign) {
-            message.push(`\n今日已签到 跳过 \n 签到时间 ${res.data.signTime}\n`)
+            message.push(`今日已签到 跳过 \n 签到时间 ${res.data.signTime}`)
             console.log(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
         } else {
             console.log('开始签到')
@@ -135,7 +135,7 @@ async function sing_msg() {
     })
         .then(json => {
             if (json.code == 'success') {
-                let log = `\n${new Date().getMonth() + 1}月 \n已签到${json.data.signUserSign.length} 天 \n连续签到 ${json.data.continuousSignDay} 天\n`
+                let log = `${new Date().getMonth() + 1}月 \n已签到${json.data.signUserSign.length} 天 \n连续签到 ${json.data.continuousSignDay} 天`
                 message.push(log)
                 console.log(log)
             }
@@ -182,7 +182,7 @@ async function show_msg() {
         })
         .catch(e => {
         })
-    message.push(`\n账户统计 \n吉分：${availablePoint}  \n能量体 ${total}  \n当前等级${privilegeNum}\n`)
+    message.push(`账户统计 \n吉分：${availablePoint}  \n能量体 ${total}  \n当前等级${privilegeNum}`)
     console.log(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
 }
 
@@ -202,7 +202,7 @@ async function create_topic() {
         // }).then(res => {
         //     console.log(`删除成功 ${id}`)
         // })
-        message.push(`\n文章发布成功\n`)
+        message.push(`文章发布成功`)
     })
 }
 
@@ -264,8 +264,8 @@ async function Envs() {
             _cookiesArr = _cookies.split('\n')
         else _cookiesArr = [_cookies]
     } else {
-        console.log(`\n 【${$.name}】：未填写变量 ${envName}`)
-        message.push(`\n 【${$.name}】：未填写变量 ${envName}\n`)
+        console.log(` 【${$.name}】：未填写变量 ${envName}`)
+        message.push(`【${$.name}】：未填写变量 ${envName}`)
         return
     }
 
@@ -276,7 +276,7 @@ async function Envs() {
 async function SendMsg(message) {
     if (!message)
         return
-
+    message = message.join("\n")
     if (Notify > 0) {
         if ($.isNode()) {
             var notify = require('./sendNotify')
