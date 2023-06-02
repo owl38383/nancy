@@ -75,7 +75,7 @@ async function getLogin() {
 
 async function get_sign() {
     try {
-        const res = request('get', 'https://app.geely.com/my/getMyCenterCounts')
+        const res = await request('get', 'https://app.geely.com/my/getMyCenterCounts')
         if (res.data.isSign) {
             message.push(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
         } else {
