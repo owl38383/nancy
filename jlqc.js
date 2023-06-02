@@ -80,7 +80,7 @@ async function get_sign() {
     try {
         const res = await request('get', 'https://app.geely.com/my/getMyCenterCounts')
         if (res.data.isSign) {
-            message.push(`今日已签到 跳过 \n 签到时间 ${res.data.signTime}\n`)
+            message.push(`\n今日已签到 跳过 \n 签到时间 ${res.data.signTime}`)
             console.log(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
         } else {
             console.log('开始签到')
@@ -135,7 +135,7 @@ async function sing_msg() {
     })
         .then(json => {
             if (json.code == 'success') {
-                let log = `${new Date().getMonth() + 1}月 \n已签到${json.data.signUserSign.length} 天 \n连续签到 ${json.data.continuousSignDay} 天\n`
+                let log = `\n${new Date().getMonth() + 1}月 \n已签到${json.data.signUserSign.length} 天 \n连续签到 ${json.data.continuousSignDay} 天`
                 message.push(log)
                 console.log(log)
             }
@@ -182,7 +182,7 @@ async function show_msg() {
         })
         .catch(e => {
         })
-    message.push(`账户统计 \n吉分：${availablePoint}  \n能量体 ${total}  \n当前等级${privilegeNum}\n`)
+    message.push(`\n账户统计 \n吉分：${availablePoint}  \n能量体 ${total}  \n当前等级${privilegeNum}`)
     console.log(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
 }
 
@@ -202,7 +202,7 @@ async function create_topic() {
         // }).then(res => {
         //     console.log(`删除成功 ${id}`)
         // })
-        message.push(`文章发布成功 \n`)
+        message.push(`\n文章发布成功`)
     })
 }
 
