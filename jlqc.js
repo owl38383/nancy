@@ -97,7 +97,7 @@ async function re_sign() {
             'resignCardId': 24448
         }
     })
-        .then(json => {
+        .then(async json => {
             await SendMsg(`签到 ${json.message}`)
             return json.code === 'success'
         })
@@ -113,11 +113,11 @@ async function sign_in() {
             'cId': 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
         }
     })
-        .then(json => {
+        .then(async json => {
             await SendMsg(`签到 ${json.message}`)
             return json.code === 'success'
         })
-        .catch(e => {
+        .catch(async e => {
             await SendMsg(`签到失败`)
         })
 }
@@ -129,7 +129,7 @@ async function sing_msg() {
             'month': new Date().getUTCMonth() + 1
         }
     })
-        .then(json => {
+        .then(async json => {
             if (json.code == 'success') {
                 await SendMsg(`${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天， 连续签到 ${json.data.continuousSignDay} 天`)
             }
@@ -192,7 +192,7 @@ async function create_topic() {
         await SendMsg(`发布成功 ${res.data}`)
         await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
             'id': id
-        }).then(res => {
+        }).then(async res => {
             await SendMsg(`删除成功 ${id}`)
         })
     })
