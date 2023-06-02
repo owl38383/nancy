@@ -72,7 +72,8 @@ async function get_sign() {
     try {
         const res = await request('get', 'https://app.geely.com/my/getMyCenterCounts')
         if (res.data.isSign) {
-            $.log(`今日已签到 跳过 \n 签到时间 ${res.data.signTime}`)
+            $.log(`今日已签到 跳过`)
+            $.log(`签到时间 ${res.data.signTime}`)
         } else {
             $.log('开始签到')
             await sign_in()
