@@ -52,7 +52,7 @@ let message = []
                 await show_msg()
             }else{
                 console.log(`账号${index}已失效`)
-                message.push(`账号${index}已失效\n`)
+                message.push(`\n账号${index}已失效\n`)
 
             }
             await SendMsg(message)
@@ -80,7 +80,7 @@ async function get_sign() {
     try {
         const res = await request('get', 'https://app.geely.com/my/getMyCenterCounts')
         if (res.data.isSign) {
-            message.push(`\n今日已签到 跳过 \n 签到时间 ${res.data.signTime}`)
+            message.push(`\n今日已签到 跳过 \n 签到时间 ${res.data.signTime}\n`)
             console.log(`今日已签到 跳过 签到时间 ${res.data.signTime}`)
         } else {
             console.log('开始签到')
@@ -135,7 +135,7 @@ async function sing_msg() {
     })
         .then(json => {
             if (json.code == 'success') {
-                let log = `\n${new Date().getMonth() + 1}月 \n已签到${json.data.signUserSign.length} 天 \n连续签到 ${json.data.continuousSignDay} 天`
+                let log = `\n${new Date().getMonth() + 1}月 \n已签到${json.data.signUserSign.length} 天 \n连续签到 ${json.data.continuousSignDay} 天\n`
                 message.push(log)
                 console.log(log)
             }
@@ -182,7 +182,7 @@ async function show_msg() {
         })
         .catch(e => {
         })
-    message.push(`\n账户统计 \n吉分：${availablePoint}  \n能量体 ${total}  \n当前等级${privilegeNum}`)
+    message.push(`\n账户统计 \n吉分：${availablePoint}  \n能量体 ${total}  \n当前等级${privilegeNum}\n`)
     console.log(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
 }
 
@@ -202,7 +202,7 @@ async function create_topic() {
         // }).then(res => {
         //     console.log(`删除成功 ${id}`)
         // })
-        message.push(`\n文章发布成功`)
+        message.push(`\n文章发布成功\n`)
     })
 }
 
@@ -265,7 +265,7 @@ async function Envs() {
         else _cookiesArr = [_cookies]
     } else {
         console.log(`\n 【${$.name}】：未填写变量 ${envName}`)
-        message.push(`\n 【${$.name}】：未填写变量 ${envName}`)
+        message.push(`\n 【${$.name}】：未填写变量 ${envName}\n`)
         return
     }
 
