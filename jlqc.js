@@ -135,7 +135,7 @@ async function sing_msg() {
     })
         .then(json => {
             if (json.code == 'success') {
-                let log = `${new Date().getMonth() + 1}月 \n已签到${json.data.signUserSign.length} 天 \n连续签到 ${json.data.continuousSignDay} 天`
+                let log = `${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天 `
                 message.push(log)
                 console.log(log)
             }
@@ -182,7 +182,7 @@ async function show_msg() {
         })
         .catch(e => {
         })
-    message.push(`账户统计 \n吉分：${availablePoint}  \n能量体 ${total}  \n当前等级${privilegeNum}`)
+    message.push(`账户统计 \n吉分：${availablePoint} 能量体 ${total} 当前等级${privilegeNum}`)
     console.log(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
 }
 
