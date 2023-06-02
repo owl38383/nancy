@@ -17,7 +17,7 @@ let _cookiesArr = []
 
     if (!(await Envs())) return  //多账号分割 判断变量是否为空  初步处理多账号
     else {
-        $.log(`\n\n=========================================    脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========================================\n`)
+        console.log(`\n\n=========================================    脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========================================\n`)
         $.log(`=================== 共找到 ${_cookiesArr.length} 个账号 ===================`)
         for (let index = 0; index < _cookiesArr.length; index++) {
             let num = index + 1
@@ -262,6 +262,7 @@ async function Envs() {
 async function SendMsg(message) {
     if (!message)
         return
+    message = message.join("\n")
     if (Notify > 0) {
         if ($.isNode()) {
             var notify = require('./sendNotify')
