@@ -6,7 +6,6 @@ cron "0 9 * * *" jlqc.js, tag:吉利汽车签到
 
 const axios = require('axios')
 const moment = require('moment')
-const {be} = require("date-fns/locale");
 const $ = new Env('吉利汽车签到')
 
 const Notify = 1; //0为关闭通知，1为打开通知,默认为1
