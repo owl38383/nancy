@@ -38,12 +38,15 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
                 'authority': 'app.geely.com',
                 'origin': 'https://app.geely.com',
                 'referer': 'https://app.geely.com/app-h5/sign-in/?showTitleBar=0&needLogin=1',
+                'cookie': `RANGERS_WEB_ID=user; HWWAFSESID=5ddd47cab52958fcf1; HWWAFSESTIME=${moment().unix()}`
             }
 
             if (debug) {
                 $.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}`);
             }
             axios.defaults.headers = headers;
+
+            // getToken()
             // 签到任务
             let login = await getLogin();
             if (login) {
@@ -62,6 +65,11 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
 
+
+async function getToken() {
+    let res = await request('post', 'https://evun.geely.com/mp/silentLogin?iamId=AN9Dd19%2F8m4ZI4IUcTAqd6VbbBc1z2%2B9mGl6dmmbGYTm6GJaiBcCgAx6eX6hf8YkvlmllmweSKjdmyqz5kS1fj5BMxxbM4AZxoC%2BMPQF4HFOVdZrbob0ixPtIWshuvn%2F7sNjg%2BfmSvA6W9qrnet%2F4jnCm1eurXYcWVlGGgHqTkI%3D&mobile=fed668c0Rt0flLCmRjFNzfHd9ZVoHt93OVEqsiV%2BOCPbBvSUYuaWErjBwa7X2%2B8fXbaqI5NoXjIcgsX7eonsAYFn8OEPQWrzxes%2B%2BdqdZxwirhfqwCS%2FISFZsB65FpjVAxZa0A4pCBCgj1itYWtlKEMaERuznUZTb0McbWN%2F82s%3D')
+    return res.data.token
+}
 
 async function getLogin() {
     try {
@@ -126,12 +134,13 @@ async function show_msg() {
     $.log(`吉分：${availablePoint} 能量体 ${total} 当前等级${privilegeNum}`)
 }
 
-async function yiyan(){
+async function yiyan() {
     let _message = '每日一句话'
     const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
     _message = res.data
     return _message
 }
+
 async function create_topic() {
     let _message = '每日一句话'
     const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
@@ -152,9 +161,10 @@ async function create_topic() {
     })
 }
 
-async function jifen(){
+async function jifen() {
 
 }
+
 async function nengliang() {
     axios.defaults.headers.referer = 'https://app.geely.com/app-h5/grow-up/?showTitleBar=0&needLogin=1&tabsIndex=1'
     let data = {
@@ -164,14 +174,14 @@ async function nengliang() {
         "pageSize": "20"
     }
     data.taskClassifyId = 7
-    await renwu("玩转社区",data)
+    await renwu("玩转社区", data)
     data.taskClassifyId = 8
-    await renwu("人车互联",data)
+    await renwu("人车互联", data)
     data.taskClassifyId = 9
     // await renwu("吉友发展",data)
 }
 
-async function renwu(title,data){
+async function renwu(title, data) {
     $.log(`【${title}】`)
     const rc = await request('post', 'https://app.geely.com/api/v1/point/access', data)
     for (const wzElement of rc.data.dataList) {
@@ -197,13 +207,28 @@ async function renwu(title,data){
             // 发布评论
             case "10592":
                 let message = await yiyan()
-                res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', {"content":`${message}`,"parentId":"","type":"2","id":"1664256028474265600","ts":1685765977,"cId":cid})
+                res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', {
+                    "content": `${message}`,
+                    "parentId": "",
+                    "type": "2",
+                    "id": "1664256028474265600",
+                    "ts": 1685765977,
+                    "cId": cid
+                })
                 success = res.code
                 break
             // 动态点赞
             case "10591":
-                res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {"flag":true,"sourceId":"1664241608889122816","sourceType":"2"})
-                res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {"flag":false,"sourceId":"1664241608889122816","sourceType":"2"})
+                res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
+                    "flag": true,
+                    "sourceId": "1664241608889122816",
+                    "sourceType": "2"
+                })
+                res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
+                    "flag": false,
+                    "sourceId": "1664241608889122816",
+                    "sourceType": "2"
+                })
                 success = res.code
                 break
             //转发分享
@@ -213,9 +238,9 @@ async function renwu(title,data){
                 break
             // 加入圈子
             case "10589":
-                res = await request('post', 'https://app.geely.com/api/v2/circle/join',{"circleId":"1595443895506968577"})
+                res = await request('post', 'https://app.geely.com/api/v2/circle/join', {"circleId": "1595443895506968577"})
                 success = res.code
-                res = await request('post', 'https://app.geely.com/api/v2/circle/quitCircle',{"circleId":"1595443895506968577"})
+                res = await request('post', 'https://app.geely.com/api/v2/circle/quitCircle', {"circleId": "1595443895506968577"})
                 break
             // 伙伴店铺打卡
             case "10581":
@@ -251,7 +276,7 @@ async function renwu(title,data){
                 break
             // 使用车控功能
             case "10567":
-                res = await request('post','https://app.geely.com/api/v1/growthSystem/badge/carControlAction')
+                res = await request('post', 'https://app.geely.com/api/v1/growthSystem/badge/carControlAction')
                 success = res.code
                 break
             // 体验虚拟车控功能
@@ -259,7 +284,7 @@ async function renwu(title,data){
                 __message = '未开发'
                 break
         }
-        $.log(`${wzElement.taskName} : ${success ?'执行完成':`执行失败/${__message}`}`)
+        $.log(`${wzElement.taskName} : ${success ? '执行完成' : `执行失败/${__message}`}`)
     }
 }
 
