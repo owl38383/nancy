@@ -5,6 +5,7 @@ cron "0 9 * * *" jlqc.js, tag:吉利汽车签到
 //详细说明参考 https://github.com/ccwav/QLScript2.
 
 const axios = require('axios')
+const moment = require('moment')
 const $ = new Env('吉利汽车签到')
 
 const Notify = 1; //0为关闭通知，1为打开通知,默认为1
@@ -13,6 +14,7 @@ const debug = 0; //0为关闭调试，1为打开调试,默认为0
 let envName = 'jlqcCookies'
 let _cookies = ($.isNode() ? process.env[envName] : $.getdata(`${envName}`)) || ''
 let _cookiesArr = []
+let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
 !(async () => {
 
     if (!(await Envs())) return  //多账号分割 判断变量是否为空  初步处理多账号
@@ -32,7 +34,10 @@ let _cookiesArr = []
                 'Content-Type': 'application/json',
                 'token': `${ck}`,
                 'user-agent': 'ji li qi che/3.5.0 (iPhone; iOS 16.5; Scale/3.00)',
-                'platform': 'iOS'
+                'platform': 'iOS',
+                'authority': 'app.geely.com',
+                'origin': 'https://app.geely.com',
+                'referer': 'https://app.geely.com/app-h5/sign-in/?showTitleBar=0&needLogin=1',
             }
 
             if (debug) {
@@ -41,12 +46,11 @@ let _cookiesArr = []
             axios.defaults.headers = headers;
             // 签到任务
             let login = await getLogin();
-            if (login){
-                await get_sign()
-                // await re_sign()
-                await create_topic()
+            if (login) {
+                await nengliang()
+                await jifen()
                 await show_msg()
-            }else{
+            } else {
                 $.log(`账号${index}已失效`)
 
             }
@@ -68,71 +72,9 @@ async function getLogin() {
     }
     return false
 }
-async function get_sign() {
-    try {
-        const res = await request('get', 'https://app.geely.com/my/getMyCenterCounts')
-        if (res.data.isSign) {
-            $.log(`今日已签到 跳过`)
-            $.log(`签到时间 ${res.data.signTime}`)
-        } else {
-            $.log('开始签到')
-            await sign_in()
-        }
-        await sing_msg()
-    } catch (error) {
-        console.error(error)
-    }
-}
-async function re_sign() {
-    request('post', 'https://app.geely.com/api/v1/userSign/reSign', {
-        data: {
-            'signTime': new Date().toLocaleDateString(),
-            'ts': (new Date().getTime() / 1000).toFixed(0),
-            'cId': 'BLqo2nmmoPgGuJtFDWlUjRI2b1b',
-            'resignCardId': 24448
-        }
-    })
-        .then(json => {
-            $.log(`签到 ${json.message}`)
-            return json.code === 'success'
-        })
-        .catch(e => {
-        })
-}
-async function sign_in() {
-    request('post', 'https://app.geely.com/api/v1/userSign/sign', {
-        data: {
-            'signDate': new Date().toLocaleString(),
-            'ts': (new Date().getTime() / 1000).toFixed(0),
-            'cId': 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
-        }
-    })
-        .then(json => {
-            $.log(`签到 ${json.message}`)
-            return json.code === 'success'
-        })
-        .catch(e => {
-            $.log(`签到失败`)
-        })
-}
-async function sing_msg() {
-    request('post', 'https://app.geely.com/api/v1/userSign/getSignMsg', {
-        data: {
-            'year': new Date().getUTCFullYear(),
-            'month': new Date().getUTCMonth() + 1
-        }
-    })
-        .then(json => {
-            if (json.code == 'success') {
-                let log = `${new Date().getMonth() + 1}月 已签到${json.data.signUserSign.length} 天 `
-                $.log(log)
-            }
-            return json.code === 'success'
-        })
-        .catch(e => {
-        })
-}
+
 async function show_msg() {
+    $.log("【当前账户信息】")
     const available = 'https://app.geely.com/api/v1/point/available'
     const summary = 'https://app.geely.com/api/v1/growthSystem/energyBody/summary'
     const getMemberLevelInfo = 'https://app.geely.com/my/getMemberLevelInfo'
@@ -140,6 +82,18 @@ async function show_msg() {
     let total
     let privilegeNum
     let availablePoint = total = privilegeNum = 0
+    let res = '';
+    res = await request('post', 'https://app.geely.com/api/v1/userSign/getSignMsg', {
+        data: {
+            'year': new Date().getUTCFullYear(),
+            'month': new Date().getUTCMonth() + 1
+        }
+    })
+
+    if (res.code == 'success') {
+        let log = `${new Date().getMonth() + 1}月 已签到${res.data.signUserSign.length} 天 `
+        $.log(log)
+    }
     await request('get', available, {})
         .then(json => {
             if (json.code === 'success') {
@@ -169,8 +123,14 @@ async function show_msg() {
         })
         .catch(e => {
         })
-    $.log(`账户统计 \n吉分：${availablePoint} 能量体 ${total} 当前等级${privilegeNum}`)
-    $.log(`账户统计 吉分：${availablePoint}  能量体 ${total}  当前等级${privilegeNum}`)
+    $.log(`吉分：${availablePoint} 能量体 ${total} 当前等级${privilegeNum}`)
+}
+
+async function yiyan(){
+    let _message = '每日一句话'
+    const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
+    _message = res.data
+    return _message
 }
 async function create_topic() {
     let _message = '每日一句话'
@@ -183,16 +143,128 @@ async function create_topic() {
     }).then(async res => {
         let id = res.data
         $.log(`发布成功 ${res.data}`)
-        // await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
-        //     'id': id
-        // }).then(res => {
-        //     $.log(`删除成功 ${id}`)
-        // })
+        await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
+            'id': id
+        }).then(res => {
+            $.log(`删除成功 ${id}`)
+        })
         $.log(`文章发布成功`)
     })
 }
+
+async function jifen(){
+
+}
+async function nengliang() {
+    axios.defaults.headers.referer = 'https://app.geely.com/app-h5/grow-up/?showTitleBar=0&needLogin=1&tabsIndex=1'
+    let data = {
+        "classify": 2,
+        "taskClassifyId": 7,
+        "pageIndex": "1",
+        "pageSize": "20"
+    }
+    data.taskClassifyId = 7
+    await renwu("玩转社区",data)
+    data.taskClassifyId = 8
+    await renwu("人车互联",data)
+    data.taskClassifyId = 9
+    // await renwu("吉友发展",data)
+}
+
+async function renwu(title,data){
+    $.log(`【${title}】`)
+    const rc = await request('post', 'https://app.geely.com/api/v1/point/access', data)
+    for (const wzElement of rc.data.dataList) {
+        if (wzElement.isFinish) {
+            $.log(`${wzElement.taskName} : 已完成 跳过任务`)
+            continue
+        }
+        if (debug) {
+            $.log(`${wzElement.taskName} ${wzElement.taskInfoId}`)
+        }
+        let res = ''
+        let success = false;
+        let __message = "";
+        switch (wzElement.taskInfoId) {
+            //每日签到
+            case "10594":
+                res = await request('post', 'https://app.geely.com/api/v1/userSign/sign', {
+                    'signTime': moment().format('YYYY-MM-DD HH:mm:ss'),
+                    'ts': moment().unix(),
+                    'cId': cid
+                })
+                break
+            // 发布评论
+            case "10592":
+                let message = await yiyan()
+                res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', {"content":`${message}`,"parentId":"","type":"2","id":"1664256028474265600","ts":1685765977,"cId":cid})
+                success = res.code
+                break
+            // 动态点赞
+            case "10591":
+                res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {"flag":true,"sourceId":"1664241608889122816","sourceType":"2"})
+                res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {"flag":false,"sourceId":"1664241608889122816","sourceType":"2"})
+                success = res.code
+                break
+            //转发分享
+            case "10590":
+                res = await request('post', 'https://app.geely.com/api/v1/share/awardPoint')
+                success = res.code
+                break
+            // 加入圈子
+            case "10589":
+                res = await request('post', 'https://app.geely.com/api/v2/circle/join',{"circleId":"1595443895506968577"})
+                success = res.code
+                res = await request('post', 'https://app.geely.com/api/v2/circle/quitCircle',{"circleId":"1595443895506968577"})
+                break
+            // 伙伴店铺打卡
+            case "10581":
+                __message = '未开发'
+                break
+            // 伙伴店铺有效评论
+            case "10580":
+                __message = '未开发'
+                break
+            // 动态被评为种草
+            case "10577":
+                __message = '未开发'
+                break
+            // 动态被评为优质
+            case "10576":
+                __message = '未开发'
+                break
+            // 试驾体验
+            case "10572":
+                __message = '未开发'
+                break
+            // 首购有礼
+            case "10570":
+                __message = '未开发'
+                break
+            // 增购有礼
+            case "10569":
+                __message = '未开发'
+                break
+            // 成功预约售后
+            case "10568":
+                __message = '未开发'
+                break
+            // 使用车控功能
+            case "10567":
+                res = await request('post','https://app.geely.com/api/v1/growthSystem/badge/carControlAction')
+                success = res.code
+                break
+            // 体验虚拟车控功能
+            case "10566":
+                __message = '未开发'
+                break
+        }
+        $.log(`${wzElement.taskName} : ${success ?'执行完成':`执行失败/${__message}`}`)
+    }
+}
+
 async function request(method, url, data) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
         try {
             let response = {}
             if (method === 'get') {
@@ -201,11 +273,7 @@ async function request(method, url, data) {
             if (method === 'post') {
                 response = await axios.post(url, data)
             }
-            if (response.data.code === 'success') {
-                resolve(response.data)
-            } else {
-                resolve()
-            }
+            resolve(response.data)
         } catch (error) {
             console.error(error)
         }
