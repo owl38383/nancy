@@ -6,6 +6,7 @@ cron "0 9 * * *" jlqc.js, tag:吉利汽车签到
 
 const axios = require('axios')
 const moment = require('moment')
+const {be} = require("date-fns/locale");
 const $ = new Env('吉利汽车签到')
 
 const Notify = 1; //0为关闭通知，1为打开通知,默认为1
@@ -50,8 +51,8 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
             // 签到任务
             let login = await getLogin();
             if (login) {
+                await create_topic()
                 await nengliang()
-                await jifen()
                 await show_msg()
             } else {
                 $.log(`账号${index}已失效`)
@@ -161,10 +162,21 @@ async function create_topic() {
     })
 }
 
-async function jifen() {
-
+async function getUser() {
+    let begin = BigInt(144115205304000001)
+    for (let i = 0; i < 100; i++) {
+        begin++
+        try {
+            let res = await request('post', `https://matrix.geely.com/geely-applet/applet/iam/userInfo`, {
+                "userId": `${begin}`,
+                "token": "eyJraWQiOjEsInR5cCI6IlJTQSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIxMDAxMzIiLCJzY29wZSI6IjEwMDEwfDEwMDAxIiwiaXNzIjoiY29tLnRlbmNlbnQudHJhdmVsLmlvdiIsImV4cCI6MTY4NTc3OTUyMSwianRpIjoiNzJhOTg2NWRkNjAwNGFkNTg2NzYwMDEwOTNkZTc0YmEifQ.a9iqyAnfc2UEOtVudGosWIvDyA8aVE3CQJwIcsVdlkHHS5nDd-OcyZl-4qjVOdt0psIu6HW4K23X4AKsuI69_gZ_IXyJuYZq6kpVUIuKAjOjSut4lKPS1ylYIKUYUBJQyEeFR9rmaPgKtnxWDBNdMpkhLRJmo-Wmb4s7pueoEYbQOweAuiT-gTYnXzu0hs1HrLehCZYuTRaf1WCphyM2r7bmdgIPJnqkNs70kJC2xni7hOYBqy1DxMUPvgE4BEjCYdBf5D4b0lngYuOPcRWU_Zz2dvQC3d4mVPBlXD7j_b4Aq7goeyGWYkjsTq7nLD5ZyCx8oHcurHHmlZfEG0JVvA"
+            })
+            console.log(`${res.data.userId}   ${res.data.mobile}   ${moment.unix(res.data.createTime / 1000).format("YYYY年MM月DD日 HH:mm:ss")} ${res.data.nickName} `)
+        } catch (e) {
+            continue
+        }
+    }
 }
-
 async function nengliang() {
     axios.defaults.headers.referer = 'https://app.geely.com/app-h5/grow-up/?showTitleBar=0&needLogin=1&tabsIndex=1'
     let data = {
