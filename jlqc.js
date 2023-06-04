@@ -1,5 +1,13 @@
 /*
-cron "0 9 * * *" jlqc.js, tag:吉利汽车签到
+
+cron "18 9 * * *" jlqc.js, tag:吉利汽车做任务
+
+支持两种cookie方式
+export jlqcCookies="ck1&ck2&ck3" // 有效期30天
+抓包方式1：
+找到链接 https://app.geely.com/api/v1/user/isLogin
+请求头 token 填入
+
  */
 
 //详细说明参考 https://github.com/ccwav/QLScript2.
@@ -64,11 +72,11 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
     .finally(() => $.done())
 
 
-async function getToken(iamId,mobile) {
-    let res = await request('post', `https://evun.geely.com/mp/silentLogin?iamId=${getSing2(iamId)}&mobile=${getSing2(mobile)}`)
-    console.log(res)
-    return res.data.token
-}
+// async function getToken(iamId,mobile) {
+//     let res = await request('post', `https://evun.geely.com/mp/silentLogin?iamId=${getSing2(iamId)}&mobile=${getSing2(mobile)}`)
+//     console.log(res)
+//     return res.data.token
+// }
 
 async function getLogin() {
     try {
@@ -79,7 +87,6 @@ async function getLogin() {
     }
     return false
 }
-
 async function show_msg() {
     $.log("【当前账户信息】")
     const available = 'https://app.geely.com/api/v1/point/available'
@@ -133,29 +140,6 @@ async function show_msg() {
     $.log(`吉分：${availablePoint} 能量体 ${total} 当前等级${privilegeNum}`)
 }
 
-async function yiyan() {
-    let _message = '每日一句话'
-    const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
-    _message = res.data
-    return _message
-}
-
-async function getUser() {
-    let begin = BigInt(144115205304000001)
-    for (let i = 0; i < 100; i++) {
-        begin++
-        try {
-            let res = await request('post', `https://matrix.geely.com/geely-applet/applet/iam/userInfo`, {
-                "userId": `${begin}`,
-                "token": "eyJraWQiOjEsInR5cCI6IlJTQSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIxMDAxMzIiLCJzY29wZSI6IjEwMDEwfDEwMDAxIiwiaXNzIjoiY29tLnRlbmNlbnQudHJhdmVsLmlvdiIsImV4cCI6MTY4NTc3OTUyMSwianRpIjoiNzJhOTg2NWRkNjAwNGFkNTg2NzYwMDEwOTNkZTc0YmEifQ.a9iqyAnfc2UEOtVudGosWIvDyA8aVE3CQJwIcsVdlkHHS5nDd-OcyZl-4qjVOdt0psIu6HW4K23X4AKsuI69_gZ_IXyJuYZq6kpVUIuKAjOjSut4lKPS1ylYIKUYUBJQyEeFR9rmaPgKtnxWDBNdMpkhLRJmo-Wmb4s7pueoEYbQOweAuiT-gTYnXzu0hs1HrLehCZYuTRaf1WCphyM2r7bmdgIPJnqkNs70kJC2xni7hOYBqy1DxMUPvgE4BEjCYdBf5D4b0lngYuOPcRWU_Zz2dvQC3d4mVPBlXD7j_b4Aq7goeyGWYkjsTq7nLD5ZyCx8oHcurHHmlZfEG0JVvA"
-            })
-            console.log(`${res.data.userId}   ${res.data.mobile}   ${moment.unix(res.data.createTime / 1000).format("YYYY年MM月DD日 HH:mm:ss")} ${res.data.nickName} `)
-        } catch (e) {
-            continue
-        }
-    }
-}
-
 async function nengliang() {
     axios.defaults.headers.referer = 'https://app.geely.com/app-h5/grow-up/?showTitleBar=0&needLogin=1&tabsIndex=1'
     let  data = {
@@ -178,22 +162,6 @@ async function nengliang() {
     data.taskClassifyId = 9
     // await renwu("吉友发展",data)
 }
-
- var _0xodP='jsjiami.com.v6',_0xodP_=function(){return['_0xodP'],_0x37ed=[_0xodP,'\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73','\x63\x49\x64','\x75\x61\x74','\x78\x70\x5a\x70\x36\x34\x53\x74\x38\x50\x4e\x37\x74\x50\x79\x36\x44\x4e\x53\x33\x50\x58\x30\x63\x49\x6a\x46','\x42\x4c\x71\x6f\x32\x6e\x6d\x6d\x6f\x50\x67\x47\x75\x4a\x74\x46\x44\x57\x6c\x55\x6a\x52\x49\x32\x62\x31\x62','\x6e\x6f\x77','\x6b\x65\x79\x73','\x73\x6f\x72\x74','\x66\x6f\x72\x45\x61\x63\x68','\x73\x6c\x69\x63\x65','\x62\x29\x67\x68\x28\x52\x70\x56\x45\x25\x58\x37\x39\x7e\x7a','\x30\x5d\x33\x4b\x40\x27\x39\x4d\x4b\x2b\x36\x4a\x66','\x74\x6f\x53\x74\x72\x69\x6e\x67','\x6c\x6f\x67','\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73\x20\u5305\u672a\u5b89\u88c5','\x59\x6a\x73\x6a\x69\x56\x61\x6d\x69\x56\x4e\x2e\x74\x4e\x46\x63\x6f\x42\x6d\x2e\x76\x58\x36\x42\x79\x44\x6c\x4f\x65\x3d\x3d'];}();function _0x9fa1(_0x30b30e,_0x29a066){_0x30b30e=~~'0x'['concat'](_0x30b30e['slice'](0x0));var _0xa85bc5=_0x37ed[_0x30b30e];return _0xa85bc5;};(function(_0x411b35,_0x3ad197){var _0x474cbb=0x0;for(_0x3ad197=_0x411b35['shift'](_0x474cbb>>0x2);_0x3ad197&&_0x3ad197!==(_0x411b35['pop'](_0x474cbb>>0x3)+'')['replace'](/[YVVNtNFBXByDlOe=]/g,'');_0x474cbb++){_0x474cbb=_0x474cbb^0x130886;}}(_0x37ed,_0x9fa1));function getSing(_0x279c66){try{let _0x4a51f3='';let {MD5}=require(_0x9fa1('0'));_0x279c66[_0x9fa1('1')]=_0x4a51f3===_0x9fa1('2')?_0x9fa1('3'):_0x9fa1('4');_0x279c66['\x74\x73']=parseInt(Date[_0x9fa1('5')]()/0x3e8);const _0x20c74a={};for(const _0x21b56b in _0x279c66){if(_0x279c66[_0x21b56b]!==''&&_0x279c66[_0x21b56b]!==null&&_0x279c66[_0x21b56b]!==undefined){_0x20c74a[_0x21b56b]=_0x279c66[_0x21b56b];}}let _0x143661=Object[_0x9fa1('6')](_0x20c74a)[_0x9fa1('7')]();let _0x4ba0ce='';_0x143661[_0x9fa1('8')](_0x31a8e0=>{_0x4ba0ce+=_0x31a8e0+'\x3d'+_0x20c74a[_0x31a8e0]+'\x26';});_0x4ba0ce=_0x4ba0ce[_0x9fa1('9')](0x0,-0x1);_0x4ba0ce+=_0x4a51f3===_0x9fa1('2')?_0x9fa1('a'):_0x9fa1('b');let _0x4c5e1f=MD5(_0x4ba0ce)[_0x9fa1('c')]();console[_0x9fa1('d')](_0x4c5e1f);return _0x4c5e1f;}catch(_0x5a698b){console[_0x9fa1('d')](_0x9fa1('e'));}};_0xodP='jsjiami.com.v6';
-
-function getSing2(data) {
-    const publicKeyString = '-----BEGIN PUBLIC KEY-----\n' +
-        'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjgEGJOO0pIPRXoQMn9UFYTk3m\n' +
-        'pdNbC9Cq3Mce4tEdyrp9dKuMqfo/uhxanXLvb+nDyX4m+9GQzwjwCKInxB8c4ofH\n' +
-        'tQ1FkgBUKpzbW0RvKRRw4o0Beb3bWOXpYDNyWPqlnH2lq+Gt316rRrpqWYqc7Hb+\n' +
-        '8vSiyhR5nd1EDv1CzQIDAQAB\n' +
-        '-----END PUBLIC KEY-----';
-    const NodeRSA = require('node-rsa');
-    const encrypt = new NodeRSA(publicKeyString);
-    const encryptedData = encrypt.encrypt(data, 'base64','utf8');
-    return encryptedData.toString();
-}
-
 async function renwu(title, data) {
     $.log(`【${title}】`)
     const rc = await request('post', 'https://app.geely.com/api/v1/point/access', data)
@@ -209,7 +177,7 @@ async function renwu(title, data) {
         let success = false;
         let __message = "";
         switch (wzElement.taskInfoId) {
-            //每日签到
+            //发布文章
             case "10556":
                 let message1 = await yiyan()
                 await request('post', 'https://app.geely.com/api/v2/topicContent/create', {
@@ -339,6 +307,30 @@ async function request(method, url, data) {
             console.error(error)
         }
     })
+}
+
+async function yiyan() {
+    let _message = '每日一句话'
+    const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
+    _message = res.data
+    return _message
+}
+var _0xodP='jsjiami.com.v6',_0xodP_=function(){return['_0xodP'],_0x37ed=[_0xodP,'\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73','\x63\x49\x64','\x75\x61\x74','\x78\x70\x5a\x70\x36\x34\x53\x74\x38\x50\x4e\x37\x74\x50\x79\x36\x44\x4e\x53\x33\x50\x58\x30\x63\x49\x6a\x46','\x42\x4c\x71\x6f\x32\x6e\x6d\x6d\x6f\x50\x67\x47\x75\x4a\x74\x46\x44\x57\x6c\x55\x6a\x52\x49\x32\x62\x31\x62','\x6e\x6f\x77','\x6b\x65\x79\x73','\x73\x6f\x72\x74','\x66\x6f\x72\x45\x61\x63\x68','\x73\x6c\x69\x63\x65','\x62\x29\x67\x68\x28\x52\x70\x56\x45\x25\x58\x37\x39\x7e\x7a','\x30\x5d\x33\x4b\x40\x27\x39\x4d\x4b\x2b\x36\x4a\x66','\x74\x6f\x53\x74\x72\x69\x6e\x67','\x6c\x6f\x67','\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73\x20\u5305\u672a\u5b89\u88c5','\x59\x6a\x73\x6a\x69\x56\x61\x6d\x69\x56\x4e\x2e\x74\x4e\x46\x63\x6f\x42\x6d\x2e\x76\x58\x36\x42\x79\x44\x6c\x4f\x65\x3d\x3d'];}();function _0x9fa1(_0x30b30e,_0x29a066){_0x30b30e=~~'0x'['concat'](_0x30b30e['slice'](0x0));var _0xa85bc5=_0x37ed[_0x30b30e];return _0xa85bc5;};(function(_0x411b35,_0x3ad197){var _0x474cbb=0x0;for(_0x3ad197=_0x411b35['shift'](_0x474cbb>>0x2);_0x3ad197&&_0x3ad197!==(_0x411b35['pop'](_0x474cbb>>0x3)+'')['replace'](/[YVVNtNFBXByDlOe=]/g,'');_0x474cbb++){_0x474cbb=_0x474cbb^0x130886;}}(_0x37ed,_0x9fa1));function getSing(_0x279c66){try{let _0x4a51f3='';let {MD5}=require(_0x9fa1('0'));_0x279c66[_0x9fa1('1')]=_0x4a51f3===_0x9fa1('2')?_0x9fa1('3'):_0x9fa1('4');_0x279c66['\x74\x73']=parseInt(Date[_0x9fa1('5')]()/0x3e8);const _0x20c74a={};for(const _0x21b56b in _0x279c66){if(_0x279c66[_0x21b56b]!==''&&_0x279c66[_0x21b56b]!==null&&_0x279c66[_0x21b56b]!==undefined){_0x20c74a[_0x21b56b]=_0x279c66[_0x21b56b];}}let _0x143661=Object[_0x9fa1('6')](_0x20c74a)[_0x9fa1('7')]();let _0x4ba0ce='';_0x143661[_0x9fa1('8')](_0x31a8e0=>{_0x4ba0ce+=_0x31a8e0+'\x3d'+_0x20c74a[_0x31a8e0]+'\x26';});_0x4ba0ce=_0x4ba0ce[_0x9fa1('9')](0x0,-0x1);_0x4ba0ce+=_0x4a51f3===_0x9fa1('2')?_0x9fa1('a'):_0x9fa1('b');let _0x4c5e1f=MD5(_0x4ba0ce)[_0x9fa1('c')]();console[_0x9fa1('d')](_0x4c5e1f);return _0x4c5e1f;}catch(_0x5a698b){console[_0x9fa1('d')](_0x9fa1('e'));}};_0xodP='jsjiami.com.v6';
+
+async function getUser() {
+    let begin = BigInt(144115205304000001)
+    for (let i = 0; i < 100; i++) {
+        begin++
+        try {
+            let res = await request('post', `https://matrix.geely.com/geely-applet/applet/iam/userInfo`, {
+                "userId": `${begin}`,
+                "token": "eyJraWQiOjEsInR5cCI6IlJTQSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIxMDAxMzIiLCJzY29wZSI6IjEwMDEwfDEwMDAxIiwiaXNzIjoiY29tLnRlbmNlbnQudHJhdmVsLmlvdiIsImV4cCI6MTY4NTc3OTUyMSwianRpIjoiNzJhOTg2NWRkNjAwNGFkNTg2NzYwMDEwOTNkZTc0YmEifQ.a9iqyAnfc2UEOtVudGosWIvDyA8aVE3CQJwIcsVdlkHHS5nDd-OcyZl-4qjVOdt0psIu6HW4K23X4AKsuI69_gZ_IXyJuYZq6kpVUIuKAjOjSut4lKPS1ylYIKUYUBJQyEeFR9rmaPgKtnxWDBNdMpkhLRJmo-Wmb4s7pueoEYbQOweAuiT-gTYnXzu0hs1HrLehCZYuTRaf1WCphyM2r7bmdgIPJnqkNs70kJC2xni7hOYBqy1DxMUPvgE4BEjCYdBf5D4b0lngYuOPcRWU_Zz2dvQC3d4mVPBlXD7j_b4Aq7goeyGWYkjsTq7nLD5ZyCx8oHcurHHmlZfEG0JVvA"
+            })
+            console.log(`${res.data.userId}   ${res.data.mobile}   ${moment.unix(res.data.createTime / 1000).format("YYYY年MM月DD日 HH:mm:ss")} ${res.data.nickName} `)
+        } catch (e) {
+            continue
+        }
+    }
 }
 
 function randomInt(min = 3000, max = 9000) {
