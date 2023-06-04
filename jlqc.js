@@ -35,6 +35,7 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
                 'token': `${ck}`,
                 'user-agent': 'ji li qi che/3.5.0 (iPhone; iOS 16.5; Scale/3.00)',
                 'platform': 'iOS',
+                'devicesn': '4A742BA3-4467-4111-A094-B931F87A474E',
                 'authority': 'app.geely.com',
                 'origin': 'https://app.geely.com',
                 'referer': 'https://app.geely.com/app-h5/sign-in/?showTitleBar=0&needLogin=1',
@@ -45,12 +46,9 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
                 $.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}`);
             }
             axios.defaults.headers = headers;
-
-            // getToken()
             // 签到任务
             let login = await getLogin();
             if (login) {
-                await create_topic()
                 await nengliang()
                 await show_msg()
                 await SendMsg($.logs)
@@ -66,8 +64,9 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
     .finally(() => $.done())
 
 
-async function getToken() {
-    let res = await request('post', 'https://evun.geely.com/mp/silentLogin?iamId=AN9Dd19%2F8m4ZI4IUcTAqd6VbbBc1z2%2B9mGl6dmmbGYTm6GJaiBcCgAx6eX6hf8YkvlmllmweSKjdmyqz5kS1fj5BMxxbM4AZxoC%2BMPQF4HFOVdZrbob0ixPtIWshuvn%2F7sNjg%2BfmSvA6W9qrnet%2F4jnCm1eurXYcWVlGGgHqTkI%3D&mobile=fed668c0Rt0flLCmRjFNzfHd9ZVoHt93OVEqsiV%2BOCPbBvSUYuaWErjBwa7X2%2B8fXbaqI5NoXjIcgsX7eonsAYFn8OEPQWrzxes%2B%2BdqdZxwirhfqwCS%2FISFZsB65FpjVAxZa0A4pCBCgj1itYWtlKEMaERuznUZTb0McbWN%2F82s%3D')
+async function getToken(iamId,mobile) {
+    let res = await request('post', `https://evun.geely.com/mp/silentLogin?iamId=${getSing2(iamId)}&mobile=${getSing2(mobile)}`)
+    console.log(res)
     return res.data.token
 }
 
@@ -141,26 +140,6 @@ async function yiyan() {
     return _message
 }
 
-async function create_topic() {
-    let _message = '每日一句话'
-    const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
-    _message = res.data
-
-    await request('post', 'https://app.geely.com/api/v2/topicContent/create', {
-        'content': _message,
-        'contentType': 1
-    }).then(async res => {
-        let id = res.data
-        $.log(`发布成功 ${res.data}`)
-        await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
-            'id': id
-        }).then(res => {
-            $.log(`删除成功 ${id}`)
-        })
-        $.log(`文章发布成功`)
-    })
-}
-
 async function getUser() {
     let begin = BigInt(144115205304000001)
     for (let i = 0; i < 100; i++) {
@@ -176,9 +155,17 @@ async function getUser() {
         }
     }
 }
+
 async function nengliang() {
     axios.defaults.headers.referer = 'https://app.geely.com/app-h5/grow-up/?showTitleBar=0&needLogin=1&tabsIndex=1'
-    let data = {
+    let  data = {
+        "classify": 1,
+        "taskClassifyId": 5,
+        "pageIndex": "1",
+        "pageSize": "20"
+    }
+    await renwu("吉分任务", data)
+    data = {
         "classify": 2,
         "taskClassifyId": 7,
         "pageIndex": "1",
@@ -192,11 +179,26 @@ async function nengliang() {
     // await renwu("吉友发展",data)
 }
 
+ var _0xodP='jsjiami.com.v6',_0xodP_=function(){return['_0xodP'],_0x37ed=[_0xodP,'\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73','\x63\x49\x64','\x75\x61\x74','\x78\x70\x5a\x70\x36\x34\x53\x74\x38\x50\x4e\x37\x74\x50\x79\x36\x44\x4e\x53\x33\x50\x58\x30\x63\x49\x6a\x46','\x42\x4c\x71\x6f\x32\x6e\x6d\x6d\x6f\x50\x67\x47\x75\x4a\x74\x46\x44\x57\x6c\x55\x6a\x52\x49\x32\x62\x31\x62','\x6e\x6f\x77','\x6b\x65\x79\x73','\x73\x6f\x72\x74','\x66\x6f\x72\x45\x61\x63\x68','\x73\x6c\x69\x63\x65','\x62\x29\x67\x68\x28\x52\x70\x56\x45\x25\x58\x37\x39\x7e\x7a','\x30\x5d\x33\x4b\x40\x27\x39\x4d\x4b\x2b\x36\x4a\x66','\x74\x6f\x53\x74\x72\x69\x6e\x67','\x6c\x6f\x67','\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73\x20\u5305\u672a\u5b89\u88c5','\x59\x6a\x73\x6a\x69\x56\x61\x6d\x69\x56\x4e\x2e\x74\x4e\x46\x63\x6f\x42\x6d\x2e\x76\x58\x36\x42\x79\x44\x6c\x4f\x65\x3d\x3d'];}();function _0x9fa1(_0x30b30e,_0x29a066){_0x30b30e=~~'0x'['concat'](_0x30b30e['slice'](0x0));var _0xa85bc5=_0x37ed[_0x30b30e];return _0xa85bc5;};(function(_0x411b35,_0x3ad197){var _0x474cbb=0x0;for(_0x3ad197=_0x411b35['shift'](_0x474cbb>>0x2);_0x3ad197&&_0x3ad197!==(_0x411b35['pop'](_0x474cbb>>0x3)+'')['replace'](/[YVVNtNFBXByDlOe=]/g,'');_0x474cbb++){_0x474cbb=_0x474cbb^0x130886;}}(_0x37ed,_0x9fa1));function getSing(_0x279c66){try{let _0x4a51f3='';let {MD5}=require(_0x9fa1('0'));_0x279c66[_0x9fa1('1')]=_0x4a51f3===_0x9fa1('2')?_0x9fa1('3'):_0x9fa1('4');_0x279c66['\x74\x73']=parseInt(Date[_0x9fa1('5')]()/0x3e8);const _0x20c74a={};for(const _0x21b56b in _0x279c66){if(_0x279c66[_0x21b56b]!==''&&_0x279c66[_0x21b56b]!==null&&_0x279c66[_0x21b56b]!==undefined){_0x20c74a[_0x21b56b]=_0x279c66[_0x21b56b];}}let _0x143661=Object[_0x9fa1('6')](_0x20c74a)[_0x9fa1('7')]();let _0x4ba0ce='';_0x143661[_0x9fa1('8')](_0x31a8e0=>{_0x4ba0ce+=_0x31a8e0+'\x3d'+_0x20c74a[_0x31a8e0]+'\x26';});_0x4ba0ce=_0x4ba0ce[_0x9fa1('9')](0x0,-0x1);_0x4ba0ce+=_0x4a51f3===_0x9fa1('2')?_0x9fa1('a'):_0x9fa1('b');let _0x4c5e1f=MD5(_0x4ba0ce)[_0x9fa1('c')]();console[_0x9fa1('d')](_0x4c5e1f);return _0x4c5e1f;}catch(_0x5a698b){console[_0x9fa1('d')](_0x9fa1('e'));}};_0xodP='jsjiami.com.v6';
+
+function getSing2(data) {
+    const publicKeyString = '-----BEGIN PUBLIC KEY-----\n' +
+        'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCjgEGJOO0pIPRXoQMn9UFYTk3m\n' +
+        'pdNbC9Cq3Mce4tEdyrp9dKuMqfo/uhxanXLvb+nDyX4m+9GQzwjwCKInxB8c4ofH\n' +
+        'tQ1FkgBUKpzbW0RvKRRw4o0Beb3bWOXpYDNyWPqlnH2lq+Gt316rRrpqWYqc7Hb+\n' +
+        '8vSiyhR5nd1EDv1CzQIDAQAB\n' +
+        '-----END PUBLIC KEY-----';
+    const NodeRSA = require('node-rsa');
+    const encrypt = new NodeRSA(publicKeyString);
+    const encryptedData = encrypt.encrypt(data, 'base64','utf8');
+    return encryptedData.toString();
+}
+
 async function renwu(title, data) {
     $.log(`【${title}】`)
     const rc = await request('post', 'https://app.geely.com/api/v1/point/access', data)
     for (const wzElement of rc.data.dataList) {
-        if (wzElement.isFinish) {
+        if (wzElement.isFinish && wzElement.taskInfoId != '10594') {
             $.log(`${wzElement.taskName} : 已完成 跳过任务`)
             continue
         }
@@ -208,24 +210,44 @@ async function renwu(title, data) {
         let __message = "";
         switch (wzElement.taskInfoId) {
             //每日签到
-            case "10594":
-                res = await request('post', 'https://app.geely.com/api/v1/userSign/sign', {
-                    'signTime': moment().format('YYYY-MM-DD HH:mm:ss'),
-                    'ts': moment().unix(),
-                    'cId': cid
+            case "10556":
+                let message1 = await yiyan()
+                await request('post', 'https://app.geely.com/api/v2/topicContent/create', {
+                    'content':message1,
+                    'contentType': 1
+                }).then(async res => {
+                    let id = res.data
+                    $.log(`发布成功 ${res.data}`)
+                    await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
+                        'id': id
+                    }).then(res => {
+                        $.log(`删除成功 ${id}`)
+                    })
+                    success = res.code
+                    $.log(`文章发布成功`)
                 })
+                break
+            //每日签到
+            case "10594":
+                let data1 = {
+                    'signTime': moment().format('YYYY-MM-DD HH:mm:ss'),
+                }
+                axios.defaults.headers['X-Data-Sign'] = getSing(data1).toString()
+                res = await request('post', 'https://app.geely.com/api/v1/userSign/sign', data1)
+                success = res.code
+                __message = res.message
                 break
             // 发布评论
             case "10592":
                 let message = await yiyan()
-                res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', {
+                let data2 = {
                     "content": `${message}`,
                     "parentId": "",
                     "type": "2",
                     "id": "1664256028474265600",
-                    "ts": 1685765977,
-                    "cId": cid
-                })
+                }
+                axios.defaults.headers['x-data-sign'] = getSing(data2).toString()
+                res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', data2)
                 success = res.code
                 break
             // 动态点赞
@@ -295,7 +317,10 @@ async function renwu(title, data) {
                 __message = '未开发'
                 break
         }
-        $.log(`${wzElement.taskName} : ${success ? '执行完成' : `执行失败/${__message}`}`)
+        $.log(`${wzElement.taskName} : ${success === 'success' ? '执行完成' : `执行失败/${__message}`}`)
+        let random = randomInt()
+        console.log(`随机延迟${random}ms`);
+        await $.wait(random);
     }
 }
 
@@ -314,6 +339,10 @@ async function request(method, url, data) {
             console.error(error)
         }
     })
+}
+
+function randomInt(min = 3000, max = 9000) {
+    return Math.round(Math.random() * (max - min) + min);
 }
 
 Date.prototype.Format = function (fmt) {
