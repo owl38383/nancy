@@ -166,7 +166,7 @@ async function renwu(title, data) {
     $.log(`【${title}】`)
     const rc = await request('post', 'https://app.geely.com/api/v1/point/access', data)
     for (const wzElement of rc.data.dataList) {
-        if (wzElement.isFinish && wzElement.taskInfoId != '10594') {
+        if (wzElement.isFinish) {
             $.log(`${wzElement.taskName} : 已完成 跳过任务`)
             continue
         }
@@ -208,11 +208,14 @@ async function renwu(title, data) {
             // 发布评论
             case "10592":
                 let message = await yiyan()
+                res = await request('get','https://app.geely.com/api/v2/topicContent/queryForSquare',{"pageSize": 20, "pageNum": 1})
+                let wenId = res.data.list[randomInt(0,5)].id
+
                 let data2 = {
                     "content": `${message}`,
                     "parentId": "",
                     "type": "2",
-                    "id": "1664256028474265600",
+                    "id": wenId,
                 }
                 axios.defaults.headers['x-data-sign'] = getSing(data2).toString()
                 res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', data2)
@@ -220,14 +223,16 @@ async function renwu(title, data) {
                 break
             // 动态点赞
             case "10591":
+                res = await request('get','https://app.geely.com/api/v2/topicContent/queryForSquare',{"pageSize": 20, "pageNum": 1})
+                let dianzan = res.data.list[randomInt(0,5)].id
                 res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
                     "flag": true,
-                    "sourceId": "1664241608889122816",
+                    "sourceId": dianzan,
                     "sourceType": "2"
                 })
                 res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
                     "flag": false,
-                    "sourceId": "1664241608889122816",
+                    "sourceId": dianzan,
                     "sourceType": "2"
                 })
                 success = res.code
@@ -239,41 +244,51 @@ async function renwu(title, data) {
                 break
             // 加入圈子
             case "10589":
-                res = await request('post', 'https://app.geely.com/api/v2/circle/join', {"circleId": "1595443895506968577"})
+                res = await request('post','https://app.geely.com/api/v2/circle/list',{"pageSize": 20, "pageNum": 1, "categoryId1": "2129"});
+                let circleId = res.data.list[randomInt(0,5)].id
+                res = await request('post', 'https://app.geely.com/api/v2/circle/join', {"circleId": circleId});
                 success = res.code
-                res = await request('post', 'https://app.geely.com/api/v2/circle/quitCircle', {"circleId": "1595443895506968577"})
+                res = await request('post', 'https://app.geely.com/api/v2/circle/quitCircle', {"circleId": circleId})
                 break
             // 伙伴店铺打卡
             case "10581":
                 __message = '未开发'
+                continue
                 break
             // 伙伴店铺有效评论
             case "10580":
                 __message = '未开发'
+                continue
                 break
             // 动态被评为种草
             case "10577":
                 __message = '未开发'
+                continue
                 break
             // 动态被评为优质
             case "10576":
                 __message = '未开发'
+                continue
                 break
             // 试驾体验
             case "10572":
                 __message = '未开发'
+                continue
                 break
             // 首购有礼
             case "10570":
                 __message = '未开发'
+                continue
                 break
             // 增购有礼
             case "10569":
                 __message = '未开发'
+                continue
                 break
             // 成功预约售后
             case "10568":
                 __message = '未开发'
+                continue
                 break
             // 使用车控功能
             case "10567":
@@ -283,7 +298,10 @@ async function renwu(title, data) {
             // 体验虚拟车控功能
             case "10566":
                 __message = '未开发'
+                continue
                 break
+            default:
+                continue
         }
         $.log(`${wzElement.taskName} : ${success === 'success' ? '执行完成' : `执行失败/${__message}`}`)
         let random = randomInt()
@@ -315,8 +333,7 @@ async function yiyan() {
     _message = res.data
     return _message
 }
-var _0xodP='jsjiami.com.v6',_0xodP_=function(){return['_0xodP'],_0x37ed=[_0xodP,'\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73','\x63\x49\x64','\x75\x61\x74','\x78\x70\x5a\x70\x36\x34\x53\x74\x38\x50\x4e\x37\x74\x50\x79\x36\x44\x4e\x53\x33\x50\x58\x30\x63\x49\x6a\x46','\x42\x4c\x71\x6f\x32\x6e\x6d\x6d\x6f\x50\x67\x47\x75\x4a\x74\x46\x44\x57\x6c\x55\x6a\x52\x49\x32\x62\x31\x62','\x6e\x6f\x77','\x6b\x65\x79\x73','\x73\x6f\x72\x74','\x66\x6f\x72\x45\x61\x63\x68','\x73\x6c\x69\x63\x65','\x62\x29\x67\x68\x28\x52\x70\x56\x45\x25\x58\x37\x39\x7e\x7a','\x30\x5d\x33\x4b\x40\x27\x39\x4d\x4b\x2b\x36\x4a\x66','\x74\x6f\x53\x74\x72\x69\x6e\x67','\x6c\x6f\x67','\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73\x20\u5305\u672a\u5b89\u88c5','\x59\x6a\x73\x6a\x69\x56\x61\x6d\x69\x56\x4e\x2e\x74\x4e\x46\x63\x6f\x42\x6d\x2e\x76\x58\x36\x42\x79\x44\x6c\x4f\x65\x3d\x3d'];}();function _0x9fa1(_0x30b30e,_0x29a066){_0x30b30e=~~'0x'['concat'](_0x30b30e['slice'](0x0));var _0xa85bc5=_0x37ed[_0x30b30e];return _0xa85bc5;};(function(_0x411b35,_0x3ad197){var _0x474cbb=0x0;for(_0x3ad197=_0x411b35['shift'](_0x474cbb>>0x2);_0x3ad197&&_0x3ad197!==(_0x411b35['pop'](_0x474cbb>>0x3)+'')['replace'](/[YVVNtNFBXByDlOe=]/g,'');_0x474cbb++){_0x474cbb=_0x474cbb^0x130886;}}(_0x37ed,_0x9fa1));function getSing(_0x279c66){try{let _0x4a51f3='';let {MD5}=require(_0x9fa1('0'));_0x279c66[_0x9fa1('1')]=_0x4a51f3===_0x9fa1('2')?_0x9fa1('3'):_0x9fa1('4');_0x279c66['\x74\x73']=parseInt(Date[_0x9fa1('5')]()/0x3e8);const _0x20c74a={};for(const _0x21b56b in _0x279c66){if(_0x279c66[_0x21b56b]!==''&&_0x279c66[_0x21b56b]!==null&&_0x279c66[_0x21b56b]!==undefined){_0x20c74a[_0x21b56b]=_0x279c66[_0x21b56b];}}let _0x143661=Object[_0x9fa1('6')](_0x20c74a)[_0x9fa1('7')]();let _0x4ba0ce='';_0x143661[_0x9fa1('8')](_0x31a8e0=>{_0x4ba0ce+=_0x31a8e0+'\x3d'+_0x20c74a[_0x31a8e0]+'\x26';});_0x4ba0ce=_0x4ba0ce[_0x9fa1('9')](0x0,-0x1);_0x4ba0ce+=_0x4a51f3===_0x9fa1('2')?_0x9fa1('a'):_0x9fa1('b');let _0x4c5e1f=MD5(_0x4ba0ce)[_0x9fa1('c')]();console[_0x9fa1('d')](_0x4c5e1f);return _0x4c5e1f;}catch(_0x5a698b){console[_0x9fa1('d')](_0x9fa1('e'));}};_0xodP='jsjiami.com.v6';
-
+var _0xodl='jsjiami.com.v6',_0xodl_=function(){return['_0xodl'],_0xebbd=[_0xodl,'\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73','\x63\x49\x64','\x75\x61\x74','\x78\x70\x5a\x70\x36\x34\x53\x74\x38\x50\x4e\x37\x74\x50\x79\x36\x44\x4e\x53\x33\x50\x58\x30\x63\x49\x6a\x46','\x42\x4c\x71\x6f\x32\x6e\x6d\x6d\x6f\x50\x67\x47\x75\x4a\x74\x46\x44\x57\x6c\x55\x6a\x52\x49\x32\x62\x31\x62','\x6e\x6f\x77','\x6b\x65\x79\x73','\x73\x6f\x72\x74','\x66\x6f\x72\x45\x61\x63\x68','\x73\x6c\x69\x63\x65','\x62\x29\x67\x68\x28\x52\x70\x56\x45\x25\x58\x37\x39\x7e\x7a','\x30\x5d\x33\x4b\x40\x27\x39\x4d\x4b\x2b\x36\x4a\x66','\x74\x6f\x53\x74\x72\x69\x6e\x67','\x6c\x6f\x67','\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73\x20\u5305\u672a\u5b89\u88c5','\x2d\x2d\x2d\x2d\x2d\x42\x45\x47\x49\x4e\x20\x50\x55\x42\x4c\x49\x43\x20\x4b\x45\x59\x2d\x2d\x2d\x2d\x2d\x4d\x49\x47\x66\x4d\x41\x30\x47\x43\x53\x71\x47\x53\x49\x62\x33\x44\x51\x45\x42\x41\x51\x55\x41\x41\x34\x47\x4e\x41\x44\x43\x42\x69\x51\x4b\x42\x67\x51\x43\x6a\x67\x45\x47\x4a\x4f\x4f\x30\x70\x49\x50\x52\x58\x6f\x51\x4d\x6e\x39\x55\x46\x59\x54\x6b\x33\x6d\x70\x64\x4e\x62\x43\x39\x43\x71\x33\x4d\x63\x65\x34\x74\x45\x64\x79\x72\x70\x39\x64\x4b\x75\x4d\x71\x66\x6f\x2f\x75\x68\x78\x61\x6e\x58\x4c\x76\x62\x2b\x6e\x44\x79\x58\x34\x6d\x2b\x39\x47\x51\x7a\x77\x6a\x77\x43\x4b\x49\x6e\x78\x42\x38\x63\x34\x6f\x66\x48\x74\x51\x31\x46\x6b\x67\x42\x55\x4b\x70\x7a\x62\x57\x30\x52\x76\x4b\x52\x52\x77\x34\x6f\x30\x42\x65\x62\x33\x62\x57\x4f\x58\x70\x59\x44\x4e\x79\x57\x50\x71\x6c\x6e\x48\x32\x6c\x71\x2b\x47\x74\x33\x31\x36\x72\x52\x72\x70\x71\x57\x59\x71\x63\x37\x48\x62\x2b\x38\x76\x53\x69\x79\x68\x52\x35\x6e\x64\x31\x45\x44\x76\x31\x43\x7a\x51\x49\x44\x41\x51\x41\x42\x2d\x2d\x2d\x2d\x2d\x45\x4e\x44\x20\x50\x55\x42\x4c\x49\x43\x20\x4b\x45\x59\x2d\x2d\x2d\x2d\x2d','\x69\x6e\x64\x65\x78\x4f\x66','\x2d\x2d\x2d\x2d\x2d\x42\x45\x47\x49\x4e','\x2d\x2d\x2d\x2d\x2d\x42\x45\x47\x49\x4e\x20\x50\x55\x42\x4c\x49\x43\x20\x4b\x45\x59\x2d\x2d\x2d\x2d\x2d','\x2d\x2d\x2d\x2d\x2d\x45\x4e\x44\x20\x50\x55\x42\x4c\x49\x43\x20\x4b\x45\x59\x2d\x2d\x2d\x2d\x2d','\x6e\x6f\x64\x65\x2d\x72\x73\x61','\x73\x65\x74\x4f\x70\x74\x69\x6f\x6e\x73','\x70\x6b\x63\x73\x31','\x65\x6e\x63\x72\x79\x70\x74','\x62\x61\x73\x65\x36\x34','\x75\x74\x66\x38','\x6a\x73\x6a\x4b\x69\x74\x61\x42\x6d\x5a\x42\x6b\x69\x2e\x4f\x47\x53\x63\x6f\x6d\x46\x2e\x70\x76\x45\x46\x49\x65\x36\x3d\x3d'];}();function _0x4fe9(_0x380491,_0x1e9801){_0x380491=~~'0x'['concat'](_0x380491['slice'](0x0));var _0x1f9c90=_0xebbd[_0x380491];return _0x1f9c90;};(function(_0xbe7e4e,_0x4498e6){var _0x1963fb=0x0;for(_0x4498e6=_0xbe7e4e['shift'](_0x1963fb>>0x2);_0x4498e6&&_0x4498e6!==(_0xbe7e4e['pop'](_0x1963fb>>0x3)+'')['replace'](/[KtBZBkOGSFpEFIe=]/g,'');_0x1963fb++){_0x1963fb=_0x1963fb^0x1308b1;}}(_0xebbd,_0x4fe9));function getSing(_0x31a276){try{let _0x309143='';let {MD5}=require(_0x4fe9('0'));_0x31a276[_0x4fe9('1')]=_0x309143===_0x4fe9('2')?_0x4fe9('3'):_0x4fe9('4');_0x31a276['\x74\x73']=parseInt(Date[_0x4fe9('5')]()/0x3e8);const _0x1bdf89={};for(const _0x39ecbb in _0x31a276){if(_0x31a276[_0x39ecbb]!==''&&_0x31a276[_0x39ecbb]!==null&&_0x31a276[_0x39ecbb]!==undefined){_0x1bdf89[_0x39ecbb]=_0x31a276[_0x39ecbb];}}let _0x417f0c=Object[_0x4fe9('6')](_0x1bdf89)[_0x4fe9('7')]();let _0x1efc89='';_0x417f0c[_0x4fe9('8')](_0x3f30d8=>{_0x1efc89+=_0x3f30d8+'\x3d'+_0x1bdf89[_0x3f30d8]+'\x26';});_0x1efc89=_0x1efc89[_0x4fe9('9')](0x0,-0x1);_0x1efc89+=_0x309143===_0x4fe9('2')?_0x4fe9('a'):_0x4fe9('b');let _0x556102=MD5(_0x1efc89)[_0x4fe9('c')]();return _0x556102;}catch(_0x14d5ad){console[_0x4fe9('d')](_0x4fe9('e'));}}function getSing2(_0x1e49b3,_0x2443dd){let _0x2566f6=_0x4fe9('f');try{if(_0x2443dd){if(_0x2443dd[_0x4fe9('10')](_0x4fe9('11'))===-0x1){_0x2443dd=_0x4fe9('12')+_0x2443dd+_0x4fe9('13');}_0x2566f6=_0x2443dd;}const _0x3eae3c=require(_0x4fe9('14'));const _0x11f164=new _0x3eae3c(_0x2566f6);_0x11f164[_0x4fe9('15')]({'\x65\x6e\x63\x72\x79\x70\x74\x69\x6f\x6e\x53\x63\x68\x65\x6d\x65':_0x4fe9('16')});const _0x3371ba=_0x11f164[_0x4fe9('17')](_0x1e49b3,_0x4fe9('18'),_0x4fe9('19'));return _0x3371ba[_0x4fe9('c')]();}catch(_0x15d681){console[_0x4fe9('d')](_0x15d681);}};_0xodl='jsjiami.com.v6';
 async function getUser() {
     let begin = BigInt(144115205304000001)
     for (let i = 0; i < 100; i++) {
@@ -333,7 +350,7 @@ async function getUser() {
     }
 }
 
-function randomInt(min = 3000, max = 9000) {
+function randomInt(min = 2000, max = 6000) {
     return Math.round(Math.random() * (max - min) + min);
 }
 
