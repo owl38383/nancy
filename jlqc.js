@@ -218,11 +218,11 @@ async function renwu(title, data) {
                 }).then(async res => {
                     let id = res.data
                     $.log(`发布成功 ${res.data}`)
-                    await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
-                        'id': id
-                    }).then(res => {
-                        $.log(`删除成功 ${id}`)
-                    })
+                    // await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
+                    //     'id': id
+                    // }).then(res => {
+                    //     $.log(`删除成功 ${id}`)
+                    // })
                     success = res.code
                     $.log(`文章发布成功`)
                 })
