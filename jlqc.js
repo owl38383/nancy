@@ -53,11 +53,11 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
                 await create_topic()
                 await nengliang()
                 await show_msg()
+                await SendMsg($.logs)
             } else {
                 $.log(`账号${index}已失效`)
 
             }
-            await SendMsg($.logs)
         }
     }
 
