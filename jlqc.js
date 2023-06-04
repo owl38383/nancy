@@ -47,7 +47,8 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
                 'authority': 'app.geely.com',
                 'origin': 'https://app.geely.com',
                 'referer': 'https://app.geely.com/app-h5/sign-in/?showTitleBar=0&needLogin=1',
-                'cookie': `RANGERS_WEB_ID=user; HWWAFSESID=5ddd47cab52958fcf1; HWWAFSESTIME=${moment().unix()}`
+                'cookie': `RANGERS_WEB_ID=user; HWWAFSESID=5ddd47cab52958fcf1; HWWAFSESTIME=${moment().unix()}`,
+                txcookie: 'IOV_ACCOUNT_SESSIONID=; userid=144115205304294815; usersig=AAAAEBD6pN46DFUQga+w6qOjiAHwMFeewVc+IJC2W2RGrZOHcX+4ZLvlKFExGpL9i/Tni0+DuRVAiJmmVX2qxsFTxoFg+xMtDDpRSZh/emCYuC/mr3EQuf5IxTzrSINB8MChhSIB3yzreM375TwZRHB0I/UE3quKnAxQfgzStjj+74PvFKRgIQ0vJ2SLPc62qqvB/TowHrZJTIz5++ZG/BKJq6lh9qEr+X4WuRulgxwQVHcNVf84NTwCDrCXlxdRlQfeftL1czD2JzfneGSy/Upb0i6i8HU='
             }
 
             if (debug) {
@@ -197,9 +198,7 @@ async function renwu(title, data) {
                 break
             //每日签到
             case "10594":
-                let data1 = {
-                    'signTime': moment().format('YYYY-MM-DD HH:mm:ss'),
-                }
+                let data1 = {}
                 axios.defaults.headers['X-Data-Sign'] = getSing(data1).toString()
                 res = await request('post', 'https://app.geely.com/api/v1/userSign/sign', data1)
                 success = res.code
@@ -208,7 +207,7 @@ async function renwu(title, data) {
             // 发布评论
             case "10592":
                 let message = await yiyan()
-                res = await request('get','https://app.geely.com/api/v2/topicContent/queryForSquare',{"pageSize": 20, "pageNum": 1})
+                res = await request('post','https://app.geely.com/api/v2/topicContent/queryForSquare',{"pageSize": 20, "pageNum": 1})
                 let wenId = res.data.list[randomInt(0,5)].id
 
                 let data2 = {
@@ -223,7 +222,7 @@ async function renwu(title, data) {
                 break
             // 动态点赞
             case "10591":
-                res = await request('get','https://app.geely.com/api/v2/topicContent/queryForSquare',{"pageSize": 20, "pageNum": 1})
+                res = await request('post','https://app.geely.com/api/v2/topicContent/queryForSquare',{"pageSize": 20, "pageNum": 1})
                 let dianzan = res.data.list[randomInt(0,5)].id
                 res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
                     "flag": true,
@@ -292,7 +291,7 @@ async function renwu(title, data) {
                 break
             // 使用车控功能
             case "10567":
-                res = await request('post', 'https://app.geely.com/api/v1/growthSystem/badge/carControlAction')
+                res = await request('get', 'https://app.geely.com/api/v1/growthSystem/badge/carControlAction')
                 success = res.code
                 break
             // 体验虚拟车控功能
@@ -323,6 +322,7 @@ async function request(method, url, data) {
             resolve(response.data)
         } catch (error) {
             console.error(error)
+        }finally {
         }
     })
 }
