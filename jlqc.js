@@ -179,6 +179,7 @@ async function renwu(title, data) {
 		let res = ''
 		let success = false;
 		let __message = "";
+		let resList = {}
 		switch (wzElement.taskInfoId) {
 			//发布文章
 			case "10556":
@@ -209,13 +210,13 @@ async function renwu(title, data) {
 			// 发布评论
 			case "10592":
 				let message = await yiyan()
-				res = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForSquare', {
+				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForSquare', {
 					"pageSize": 20,
 					"pageNum": 1
 				})
 				
 				for (let i = 0; i < 5; i++) {
-					let wenId = res.data.list[i].id
+					let wenId = resList.data.list[i].id
 					let data2 = {
 						"content": `${message}`,
 						"parentId": "",
@@ -230,12 +231,12 @@ async function renwu(title, data) {
 				break
 			// 动态点赞
 			case "10591":
-				res = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForSquare', {
+				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForSquare', {
 					"pageSize": 20,
 					"pageNum": 1
 				})
 				for (let i = 0; i < 5; i++) {
-					let dianzan = res.data.list[randomInt(0, 5)].id
+					let dianzan = resList.data.list[randomInt(0, 5)].id
 					res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
 						"flag": true,
 						"sourceId": dianzan,
