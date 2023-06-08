@@ -27,8 +27,8 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
 	
 	if (!(await Envs())) return  //多账号分割 判断变量是否为空  初步处理多账号
 	else {
-		console.log(`\n\n=========================================    脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========================================\n`)
-		$.log(`=================== 共找到 ${_cookiesArr.length} 个账号 ===================`)
+		console.log(`\n\n========= 脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========\n`)
+		$.log(`======== 共找到 ${_cookiesArr.length} 个账号 ========`)
 		for (let index = 0; index < _cookiesArr.length; index++) {
 			let num = index + 1
 			$.log(`========= 开始【第 ${num} 个账号】=========`)
@@ -212,7 +212,8 @@ async function renwu(title, data) {
 				let message = await yiyan()
 				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForFollow', {
 					"pageSize": 20,
-					"pageNum": 1
+					"pageNum": 1,
+					"followQueryType": "1"
 				})
 				
 				for (let i = 0; i < 5; i++) {
@@ -233,7 +234,8 @@ async function renwu(title, data) {
 			case "10591":
 				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForFollow', {
 					"pageSize": 20,
-					"pageNum": 1
+					"pageNum": 1,
+					"followQueryType": "1"
 				})
 				for (let i = 0; i < 5; i++) {
 					let dianzan = resList.data.list[randomInt(0, 5)].id
