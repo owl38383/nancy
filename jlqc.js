@@ -210,7 +210,7 @@ async function renwu(title, data) {
 			// 发布评论
 			case "10592":
 				let message = await yiyan()
-				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForSquare', {
+				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForFollow', {
 					"pageSize": 20,
 					"pageNum": 1
 				})
@@ -231,7 +231,7 @@ async function renwu(title, data) {
 				break
 			// 动态点赞
 			case "10591":
-				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForSquare', {
+				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForFollow', {
 					"pageSize": 20,
 					"pageNum": 1
 				})
