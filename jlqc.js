@@ -216,7 +216,7 @@ async function renwu(title, data) {
 					"followQueryType": "1"
 				})
 				
-				for (let i = 0; i < 5; i++) {
+				for (let i = 0; i < 2; i++) {
 					let wenId = resList.data.list[i].id
 					let data2 = {
 						"content": `${message}`,
@@ -239,7 +239,7 @@ async function renwu(title, data) {
 					"followQueryType": "1"
 				})
 				console.log(res)
-				for (let i = 0; i < 5; i++) {
+				for (let i = 0; i < 3; i++) {
 					let dianzan = resList.data.list[randomInt(0, 5)].id
 					res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
 						"flag": true,
