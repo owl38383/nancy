@@ -227,7 +227,8 @@ async function renwu(title, data) {
 					axios.defaults.headers['x-data-sign'] = getSing(data2).toString()
 					res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', data2)
 					success = res.code
-					await sleep(3)
+					console.log(res)
+					await sleep(1)
 				}
 				break
 			// 动态点赞
@@ -237,6 +238,7 @@ async function renwu(title, data) {
 					"pageNum": 1,
 					"followQueryType": "1"
 				})
+				console.log(res)
 				for (let i = 0; i < 5; i++) {
 					let dianzan = resList.data.list[randomInt(0, 5)].id
 					res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
@@ -244,13 +246,15 @@ async function renwu(title, data) {
 						"sourceId": dianzan,
 						"sourceType": "2"
 					})
-					await sleep(2)
+					console.log(res)
+					await sleep(1)
 					res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
 						"flag": false,
 						"sourceId": dianzan,
 						"sourceType": "2"
 					})
-					await sleep(3)
+					console.log(res)
+					await sleep(1)
 				}
 				break
 			//转发分享
