@@ -1,9 +1,9 @@
 /*
 
-cron "18 9 * * *" jlqc.js, tag:吉利汽车做任务
+cron "30 6 * * *" jlqc.js, tag:吉利汽车做任务
 
 支持两种cookie方式
-export bjjjCookies="ck1&ck2&ck3" // 有效期30天
+export bjjjCookies="ck1" // 有效期30天
 export bjjjjjzzl="02"
 抓包方式1：
 找到链接 https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/stateList
@@ -60,82 +60,97 @@ async function getState () {
   try {
     // 01 六环内 02 六环外
     let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/stateList', {})
-    for (let item of res.data.bzclxx){
-        $.log(`当前车辆${item.hphm} 六环外${item.ecbzxx.length} 六环内${item.bzxx.length}`)
+    for (let bzclxxItem of res.data.bzclxx) {
+      $.log(`车辆【${bzclxxItem.hphm}】 六环外${bzclxxItem.ecbzxx.length} 六环内${bzclxxItem.bzxx.length}`)
+      // if (bzclxxItem.bzxx.length > 0 || bzclxxItem.ecbzxx.length > 0) {
+      //   $.log(`车辆【${bzclxxItem.hphm}】 可在六环外行驶`)
+      //   return
+      // }
+      let sxsyts = ''
+      for (let item of bzclxxItem.bzxx) {
+        $.log(`车辆【${bzclxxItem.hphm}】 六环内 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`)
+        sxsyts = item.sxsyts
+      }
+
+      for (let item of bzclxxItem.ecbzxx) {
+        $.log(`车辆【${bzclxxItem.hphm}】 六环外 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`)
+        sxsyts = item.sxsyts
+      }
+      if (sxsyts >1){
+        $.log(`车辆【${bzclxxItem.hphm}】 六环外还可行驶 ${sxsyts} 天 `)
+        return
+      }
+      $.log(`车辆【${bzclxxItem.hphm}】 准备申请六环${jjzzl == "01"?'内':'外'}`)
+      let vId = bzclxxItem.vId;
+      let hpzl = bzclxxItem.hpzl;
+      let hphm = bzclxxItem.hphm;
+      await sleep(1)
+      let res = await applyVehicleCheck({
+        'hpzl': hpzl,
+        'hphm': hphm,
+      })
+      $.log(`车辆【${bzclxxItem.hphm}】 校验状态${res}`)
+      if (res){
+        // 获取申请人信息
+        await sleep(1)
+        let a = await getJsrxx()
+        let jszh = a.jszh
+        let jsrxm = a.jsrxm
+        $.log(`车辆【${bzclxxItem.hphm}】 获取申请人信息成功`)
+        // 检查状态
+        await sleep(1)
+        res = await applyCheckNum({
+          'txrxx': [],
+          'jsrxm': jsrxm,
+          'jszh': jszh,
+        })
+        $.log(`车辆【${bzclxxItem.hphm}】 检查状态${res}`)
+        // 获取办理日期
+        await sleep(1)
+        let dataList = await checkHandle({
+          'vId': vId,
+          'jjzzl': jjzzl,
+          'hphm': hphm,
+        })
+        let date = dataList.data.jjrqs[0]
+        console.log(dataList)
+        // 申请办证
+        await sleep(1)
+        await insertApplyRecord({
+          'jjzzl': jjzzl,
+          'vId': vId,
+          'jsrxm': jsrxm,
+          'hpzl': hpzl,
+          'hphm': hphm,
+          'jjrq': date,
+          'jszh': jszh,
+        })
+      }
+
     }
-    return
-    let bzclxxItem = res.data.bzclxx[0]
-    let vId = bzclxxItem.vId
-    let hpzl = bzclxxItem.hpzl
-    let hphm = bzclxxItem.hphm
-    await sleep(1)
-    await applyVehicleCheck({
-      'hpzl': hpzl,
-      'hphm': hphm,
-    })
-    // 获取申请人信息
-    await sleep(1)
-    let a = await getJsrxx()
-    let jszh = a.jszh
-    let jsrxm = a.jsrxm
-    // 检查状态
-    await sleep(1)
-    await applyCheckNum({
-      "txrxx": [],
-      "jsrxm": jsrxm,
-      "jszh": jszh
-    })
-    // 获取办理日期
-    await sleep(1)
-    let dataList = await checkHandle({
-      "vId": vId,
-      "jjzzl": jjzzl,
-      "hphm": hphm
-    })
-    let date = dataList.data.jjrqs[0]
-    // 申请办证
-    await sleep(1)
-    await insertApplyRecord({
-      "jjzzl": jjzzl,
-      "vId": vId,
-      "jsrxm": jsrxm,
-      'hpzl': hpzl,
-      'hphm': hphm,
-      'jjrq': date,
-      "jszh": jszh
-    })
+
   } catch (error) {
     console.error(error)
   }
 }
 
 async function applyVehicleCheck (params) {
-  try {
-    let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/applyVehicleCheck', params)
-    return res.code === '200'
-  } catch (error) {
-    console.error(error)
-  }
-  return false
+  let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/applyVehicleCheck', params)
+  return res.data === '200'
 }
 
 async function getJsrxx () {
-    let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/getJsrxx', {})
-    return res.data
+  let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/getJsrxx', {})
+  return res.data
 }
 
 async function applyCheckNum (params) {
-  try {
-    let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/applyCheckNum',params)
-    return res.code === '200'
-  } catch (error) {
-    console.error(error)
-  }
-  return false
+  let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/applyCheckNum', params)
+  return res.code === 200
 }
 
 async function checkHandle (params) {
-    return await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/checkHandle',params)
+  return await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/checkHandle', params)
 }
 
 async function insertApplyRecord (data) {
@@ -155,13 +170,13 @@ async function insertApplyRecord (data) {
       'jjdzgdwd': '40.032806',
       'sqdzbdjd': '116.627042',
       'jjdzbdjd': '116.627445',
-      'xxdz': '首安公司',
+      'xxdz': '恒大',
       'jjlkmc': '其他道路',
     }
-    let _params = Object.assign({},data,params)
+    let _params = Object.assign({}, data, params)
     console.log(_params)
-    let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/insertApplyRecord', _params)
-    return res.code === '200'
+    // let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/insertApplyRecord', _params)
+    // return res.code === '200'
   } catch (error) {
     console.error(error)
   }
@@ -193,7 +208,7 @@ function randomInt (min = 1000, max = 5000) {
 
 async function sleep (max) {
   let random = randomInt(1000, max * 1000)
-  console.log(`随机延迟${random}ms`)
+  // console.log(`随机延迟${random}ms`)
   await $.wait(random)
 }
 
@@ -261,46 +276,6 @@ async function SendMsg (message) {
     console.log(message)
   }
 }
-
-function getRand (min, max) {
-  return parseInt(Math.random() * (max - min)) + min
-}
-
-function uuid () {
-  var s = []
-  var hexDigits = '0123456789abcdef'
-  for (var i = 0; i < 36; i++) {
-    s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)
-  }
-  s[14] = '4'
-  s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1)
-  s[8] = s[13] = s[18] = s[23] = '-'
-  var uuid = s.join('')
-  return uuid
-}
-
-function uuidRandom () {
-  return Math.random().toString(16).slice(2, 10) +
-    Math.random().toString(16).slice(2, 10) +
-    Math.random().toString(16).slice(2, 10) +
-    Math.random().toString(16).slice(2, 10) +
-    Math.random().toString(16).slice(2, 10)
-}
-
-function random (arr) {
-  return arr[Math.floor(Math.random() * arr.length)]
-}
-
-function randomNumber (len) {
-  let chars = '0123456789'
-  let maxPos = chars.length
-  let str = ''
-  for (let i = 0; i < len; i++) {
-    str += chars.charAt(Math.floor(Math.random() * maxPos))
-  }
-  return Date.now() + str
-}
-
 
 // prettier-ignore
 function Env(t, e) {
