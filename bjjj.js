@@ -14,6 +14,8 @@ export bjjjjjzzl="02"
 //详细说明参考 https://github.com/ccwav/QLScript2.
 
 const axios = require('axios')
+const HttpsProxyAgent = require("https-proxy-agent");
+
 const $ = new Env('北京交警进京证六环外续')
 
 const Notify = 1 //0为关闭通知，1为打开通知,默认为1
@@ -49,6 +51,8 @@ let _cookiesArr = ['']
         $.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}`)
       }
       axios.defaults.headers = headers
+      axios.defaults.proxy= false
+      axios.defaults.httpAgent=new HttpsProxyAgent.HttpsProxyAgent(`http://101.200.222.212:34246`);
       // 获取
       await getState()
     }
