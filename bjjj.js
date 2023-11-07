@@ -1,6 +1,6 @@
 /*
 
-cron "30 6 * * *" jlqc.js, tag:吉利汽车做任务
+cron "30 6 * * *" bjjj.js, tag:北京交警进京证六环外续
 
 支持两种cookie方式
 export bjjjCookies="ck1" // 有效期30天
@@ -62,16 +62,11 @@ async function getState () {
     let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/stateList', {})
     for (let bzclxxItem of res.data.bzclxx) {
       $.log(`车辆【${bzclxxItem.hphm}】 六环外${bzclxxItem.ecbzxx.length} 六环内${bzclxxItem.bzxx.length}`)
-      // if (bzclxxItem.bzxx.length > 0 || bzclxxItem.ecbzxx.length > 0) {
-      //   $.log(`车辆【${bzclxxItem.hphm}】 可在六环外行驶`)
-      //   return
-      // }
       let sxsyts = ''
       for (let item of bzclxxItem.bzxx) {
         $.log(`车辆【${bzclxxItem.hphm}】 六环内 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`)
         sxsyts = item.sxsyts
       }
-
       for (let item of bzclxxItem.ecbzxx) {
         $.log(`车辆【${bzclxxItem.hphm}】 六环外 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`)
         sxsyts = item.sxsyts
@@ -113,7 +108,6 @@ async function getState () {
           'hphm': hphm,
         })
         let date = dataList.data.jjrqs[0]
-        console.log(dataList)
         // 申请办证
         await sleep(1)
         await insertApplyRecord({
@@ -125,8 +119,8 @@ async function getState () {
           'jjrq': date,
           'jszh': jszh,
         })
+        $.log(`车辆【${bzclxxItem.hphm}】 申请成功`)
       }
-
     }
 
   } catch (error) {
@@ -174,9 +168,8 @@ async function insertApplyRecord (data) {
       'jjlkmc': '其他道路',
     }
     let _params = Object.assign({}, data, params)
-    console.log(_params)
-    // let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/insertApplyRecord', _params)
-    // return res.code === '200'
+    let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/insertApplyRecord', _params)
+    return res.data
   } catch (error) {
     console.error(error)
   }
