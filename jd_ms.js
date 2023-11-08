@@ -60,8 +60,8 @@ let msg = []
 
 async function bean() {
 	// 秒杀浏览
-	// await huiwan();
-	await seckillViewTask();
+	await huiwan();
+	// await seckillViewTask();
 }
 
 // 秒杀浏览
@@ -87,8 +87,8 @@ async function huiwan() {
   let params = {
     appid: "babelh5",
     sign: 11,
-    t: 1699427778112,
-    body: {
+    t: new Date().getTime(),
+    body: JSON.stringify({
       sourceCode: "acetttsign",
       encryptProjectId: "226udfnoxMAvQ7r1mWK17TvoLWDg",
       encryptAssignmentId: "4ZFePHhEMCywBQc3GFpLm1TUSY5k",
@@ -97,21 +97,39 @@ async function huiwan() {
       extParam: {
         forceBot: "1",
         businessData: { random: "fYBBsBpr" },
-        signStr: "1699427778045~1Uas41NwYc0MDF3SFVXZjk5MQ==.Rn5sblJFf2JgV0NxZikiLgxtYlQgcT4NGEZkY3tXW3krZRhGNhQWEhUiLDZUOw0GACsAHg0VVT0aAToXThwSZQAReDgUVCEMAjs5AAkUFic2Nis=.04b37805~1,1~571549FD6C38C05CF895C9A8DCF3377A43A6410B~1k596sf~C~TRtGXhUObWQeEUNaWxsIaBVQBxQHYBt8BBUBA20YQxVGERsWUgwfC2EYAHseBgJ6GlgeRxUYFF0FHg9iGg9wHwIMeRVTH0MWaxUQVEVaFAMDHxVHRRsIEQYCDwAGAQADAQgABA4ABgwBERsWQVxWEQ0WQk1GR0NAUF8QHxVDU1gQCRVSUE1GR0NBVxseEUdQWBsIaAMHGggABBsGAxULHwYYA2QeEV1eFAMDHxVXRRsIEQ9RBl1XCwFXAl0DUFNRA19RV1RSV1hQC1UAUg9XUgECFBUQXUcWDBtbY19bWFwQHxVAFAMDBQ4NAgsFBAAMBg0HHxVeXRsIEQMCUgwCC1IGBl8GVgQGBwABVQ5WVwoCB1MEBAtXUFJSUlhTVVUDVA4QHxVSRlsQCRV1d0pqWE5VBHV3UXJGZl4FWgBndGkKR2hHbA5nV0JcV2tzAl5zUF5zcnZ1BkF/SVRMeX17A3peb0N9ZQ5DFBUQXUEWDBtzQ0dYUxlxXFpEQ01XQRsUf1dRHRUYFFdTRRUOFAgECw8NDhseEURXRBsIaA8AAhUBCgdpGhtAXBUObRtbY19bWFwDBxsDFBUQWnhnFBUQAgAaBxseEQYGGAgcBxUYFAgECw8NDhseEQMCUgwCC1IGBl8GVgQGBwABVQ5WVwoCB1MEBAtXUFJSUlhTVVUDVA4QHxVVFGQeEV5bVxsIEVFSUF9UVUNAFBUQUl0WDBtHERsWVVAQCRVDBRcHHQUWGhtRVWhCFAMQCg4WGhtQVxUOFEtTXVNbWwRUanV2RXtCQRUYFFRYEQ1vBBUCHwdpGhtQX1hTFAMQAgENDw0ABAACAgoEB0kFc38GXkMNZgADCnpwfHJjAGVGV0NzSnl1CwQcVgRieGxeCgBRBndRZgQNQWhaZWRxdQ1kd2F+AndYS2RyYkFEd1xQdGNcenxsZG8FY2NhR3tKA09+ZXtocVBtXnpmA31wcgkFY051fXVYR1JkT1IAeWRbXF12QAd3XFECdmFTeGljegZ/X0kEfE1fZHp2enp5dXNQcU5fQnxhYlRRUXRkdWYJCxdRBQUBDwhRA0lNGghMTUl2SGpaYWZjZHh2dmFXd3FVfmR8TndjdlBfZW5wYlFyWkF1dmZbZ35KC2BmTnB+dlBXdXtjUGV8dHdkZWBAfn9zWGR1UUpgdHVydXxFXGVxTgFhZFx9Yn1wdnJ8Z2B2cnZ9VHFKaWRxUUphdmJDC0cDXFMFUUpcERsWW0pVEQ0WFEQ=~188otbr",
+        signStr: "-1",
         sceneid: "babel_3fJZ27dqd7iAffkm2QRwc1eZwbK6",
       },
       activity_id: "3fJZ27dqd7iAffkm2QRwc1eZwbK6",
       template_id: "00019605",
       floor_id: "99001723",
       enc: "F07D09E45F2905D1E3D62290B03463AF90A1EAB4AFC8AFBE3DA6C4BC1309AB3CFE9617545D5FE0B04BB372A1EBC4564DB8F2445ABC3332009555984C0E43A8D1",
-    },
+    }),
   };
-  let res = await request(
-    "post",
-    "https://api.m.jd.com/client.action?functionId=doInteractiveAssignment",
-    params
-  );
+  let params2 = {
+    appid: "babelh5",
+    sign: 11,
+    t: new Date().getTime(),
+    body: JSON.stringify({
+      sourceCode: "acetttsign",
+      encryptProjectId: "226udfnoxMAvQ7r1mWK17TvoLWDg",
+      encryptAssigmentIds: ["4ZFePHhEMCywBQc3GFpLm1TUSY5k"],
+      ext: {
+        rewardEncryptAssignmentId: "4ZFePHhEMCywBQc3GFpLm1TUSY5k",
+        timesEncryptAssignmentId: "4ZFePHhEMCywBQc3GFpLm1TUSY5k",
+        needNum: 50,
+      },
+    },)
+  };
+
+  let res1 = await request("post", "https://api.m.jd.com/client.action?functionId=queryInteractiveInfo", params2);
+  console.log(res1);
+
+
+  let res = await request("post", "https://api.m.jd.com/client.action?functionId=doInteractiveAssignment", params);
   console.log(res);
+
+
 }
 
 function isLoginByX1a0He() {
