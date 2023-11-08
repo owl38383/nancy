@@ -96,17 +96,17 @@ async function getState() {
       $.log(`车辆【${bzclxxItem.hphm}】 六环外${bzclxxItem.ecbzxx.length} 六环内${bzclxxItem.bzxx.length}`);
       let sxsyts = '';
       for (let item of bzclxxItem.bzxx) {
-        msg += `车辆【${bzclxxItem.hphm}】 六环内 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz} 无需申请`
+        msg += `车辆【${bzclxxItem.hphm}】 六环内 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz} 无需申请\n`
         $.log(`车辆【${bzclxxItem.hphm}】 六环内 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`);
         sxsyts = item.sxsyts;
       }
       for (let item of bzclxxItem.ecbzxx) {
-        msg += `车辆【${bzclxxItem.hphm}】 六环外 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz} 无需申请`
+        msg += `车辆【${bzclxxItem.hphm}】 六环外 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz} 无需申请\n`
         $.log(`车辆【${bzclxxItem.hphm}】 六环外 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`);
         sxsyts = item.sxsyts;
       }
       if (sxsyts > 1) {
-        msg += `进京证 ${sxsyts} 天后到期`
+        msg += `进京证 ${sxsyts} 天后到期\n`
         $.log(`车辆【${bzclxxItem.hphm}】 六环外还可行驶 ${sxsyts} 天 `);
         return false;
       }
