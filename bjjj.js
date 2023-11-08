@@ -13,14 +13,13 @@ export bjjjjjzzl="02"
 
 //详细说明参考 https://github.com/ccwav/QLScript2.
 
-const axios = require('axios')
-
 const $ = new Env('北京交警进京证六环外续')
 
 const Notify = 1 //0为关闭通知，1为打开通知,默认为1
 const debug = 0 //0为关闭调试，1为打开调试,默认为0
 
 let envName = 'bjjjCookies'
+let cookie = ''
 let _cookies = ($.isNode() ? process.env[envName] : $.getdata(`${envName}`)) || ''
 let jjzzl = ($.isNode() ? process.env['bjjjjjzzl'] : $.getdata('bjjjjjzzl')) || '02'
 let _cookiesArr = ['']
@@ -34,28 +33,56 @@ let _cookiesArr = ['']
       let num = index + 1
       $.log(`========= 开始【第 ${num} 个账号】=========`)
       // msg += ` 【第 ${num} 个账号】`
-      let ck = _cookiesArr[index]
-      let headers = {
-        'Accept': '*/*',
+      cookie = _cookiesArr[index]
+
+
+      if (debug) {
+        $.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${cookie}`)
+      }
+      // 获取
+      await getState()
+      await SendMsg($.logs)
+    }
+  }
+
+})().catch((e) => $.logErr(e)).finally(() => $.done())
+
+function taskUrl(url = "",data={}) {
+  let options = {
+    url:url,
+    json: data,
+    headers: {
+       'Accept': '*/*',
         'Accept-Encoding': 'gzip, deflate, br',
         'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
         'Connection': 'keep-alive',
         'Content-Type': 'application/json',
         'User-Agent': 'BeiJingJiaoJing/2.9.1 (iPhone; iOS 17.1; Scale/3.00)',
         'Host': 'jjz.jtgl.beijing.gov.cn',
-        'Authorization': `${ck}`,
-      }
-
-      if (debug) {
-        $.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}`)
-      }
-      axios.defaults.headers = headers
-      // 获取
-      await getState()
-    }
+        'Authorization': `${cookie}`,
+    },
+    timeout: 10000
   }
 
-})().catch((e) => $.logErr(e)).finally(() => $.done())
+  let HTTP_PROXY_HOST = ''
+  let HTTP_PROXY_PORT = ''
+  if (process.env.TG_PROXY_HOST) HTTP_PROXY_HOST = process.env.HTTP_PROXY_HOST;
+  if (process.env.HTTP_PROXY_PORT) HTTP_PROXY_PORT = process.env.HTTP_PROXY_PORT;
+
+  if (HTTP_PROXY_HOST && HTTP_PROXY_PORT) {
+    const tunnel = require("tunnel");
+    const agent = {
+      https: tunnel.httpsOverHttp({
+        proxy: {
+          host: HTTP_PROXY_HOST,
+          port: HTTP_PROXY_PORT * 1,
+        }
+      })
+    }
+    Object.assign(options, {agent})
+  }
+  return options
+}
 
 async function getState () {
   try {
@@ -180,15 +207,26 @@ async function insertApplyRecord (data) {
 async function request (method, url, data) {
   return new Promise(async (resolve) => {
     try {
-      let response = {}
       if (method === 'get') {
-        response = await axios.get(url, { params: data })
+        $.get(taskUrl(url,data),(err, resp, data) => {
+          if (err) {
+            console.log(err);
+          } else {
+            data = JSON.parse(data);
+            resolve(data)
+          }
+        })
       }
       if (method === 'post') {
-        response = await axios.post(url, data)
+        $.post(taskUrl(url,data), (err, resp, data) => {
+          if (err) {
+            console.log(err);
+          } else {
+            data = JSON.parse(data);
+            resolve(data)
+          }
+        })
       }
-      // console.log(JSON.stringify(response.data))
-      resolve(response.data)
     } catch (error) {
       console.error(error)
     } finally {
