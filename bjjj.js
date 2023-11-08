@@ -92,29 +92,23 @@ function taskUrl(url = '', data = {}) {
 async function getState() {
   try {
     // 01 六环内 02 六环外
-    let res = await request('post',
-        'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/stateList',
-        {});
+    let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/stateList', {});
     for (let bzclxxItem of res.data.bzclxx) {
-      $.log(
-          `车辆【${bzclxxItem.hphm}】 六环外${bzclxxItem.ecbzxx.length} 六环内${bzclxxItem.bzxx.length}`);
+      $.log(`车辆【${bzclxxItem.hphm}】 六环外${bzclxxItem.ecbzxx.length} 六环内${bzclxxItem.bzxx.length}`);
       let sxsyts = '';
       for (let item of bzclxxItem.bzxx) {
-        $.log(
-            `车辆【${bzclxxItem.hphm}】 六环内 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`);
+        $.log(`车辆【${bzclxxItem.hphm}】 六环内 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`);
         sxsyts = item.sxsyts;
       }
       for (let item of bzclxxItem.ecbzxx) {
-        $.log(
-            `车辆【${bzclxxItem.hphm}】 六环外 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`);
+        $.log(`车辆【${bzclxxItem.hphm}】 六环外 ${bzclxxItem.ybcs} / ${bzclxxItem.sycs} 当前周期 ${item.yxqs} ${item.yxqz}`);
         sxsyts = item.sxsyts;
       }
       if (sxsyts > 1) {
         $.log(`车辆【${bzclxxItem.hphm}】 六环外还可行驶 ${sxsyts} 天 `);
         return false;
       }
-      $.log(
-          `车辆【${bzclxxItem.hphm}】 准备申请六环${jjzzl == '01' ? '内' : '外'}`);
+      $.log(`车辆【${bzclxxItem.hphm}】 准备申请六环${jjzzl == '01' ? '内' : '外'}`);
       let vId = bzclxxItem.vId;
       let hpzl = bzclxxItem.hpzl;
       let hphm = bzclxxItem.hphm;
@@ -170,29 +164,22 @@ async function getState() {
 }
 
 async function applyVehicleCheck(params) {
-  let res = await request('post',
-      'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/applyVehicleCheck',
-      params);
+  let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/applyVehicleCheck', params);
   return res.data === '200';
 }
 
 async function getJsrxx() {
-  let res = await request('post',
-      'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/getJsrxx', {});
+  let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/getJsrxx', {});
   return res.data;
 }
 
 async function applyCheckNum(params) {
-  let res = await request('post',
-      'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/applyCheckNum',
-      params);
+  let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/applyCheckNum', params);
   return res.code === 200;
 }
 
 async function checkHandle(params) {
-  return await request('post',
-      'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/checkHandle',
-      params);
+  return await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/checkHandle', params);
 }
 
 async function insertApplyRecord(data) {
@@ -216,9 +203,7 @@ async function insertApplyRecord(data) {
       'jjlkmc': '其他道路',
     };
     let _params = Object.assign({}, data, params);
-    let res = await request('post',
-        'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/insertApplyRecord',
-        _params);
+    let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/insertApplyRecord', _params);
     return res.data;
   } catch (error) {
     console.error(error);
@@ -227,12 +212,12 @@ async function insertApplyRecord(data) {
 }
 
 async function request(method, url, data) {
-  return new Promise(async (resolve) => {
-    try {
+  return new Promise((resolve, reject) => {
       if (method === 'get') {
         $.get(taskUrl(url, data), (err, resp, data) => {
           if (err) {
             console.log(err);
+            resolve(err);
           } else {
             data = JSON.parse(data);
             resolve(data);
@@ -243,16 +228,13 @@ async function request(method, url, data) {
         $.post(taskUrl(url, data), (err, resp, data) => {
           if (err) {
             console.log(err);
+            resolve(err);
           } else {
             data = JSON.parse(data);
             resolve(data);
           }
         });
       }
-    } catch (error) {
-      console.error(error);
-    } finally {
-    }
   });
 }
 
