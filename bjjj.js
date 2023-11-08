@@ -41,7 +41,7 @@ let _cookiesArr = ['']
       }
       // 获取
       await getState()
-      await SendMsg($.logs)
+      // await SendMsg($.logs)
     }
   }
 
