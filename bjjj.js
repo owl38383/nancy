@@ -32,7 +32,6 @@ let _cookiesArr = ['']
     for (let index = 0; index < _cookiesArr.length; index++) {
       let num = index + 1
       $.log(`========= 开始【第 ${num} 个账号】=========`)
-      // msg += ` 【第 ${num} 个账号】`
       cookie = _cookiesArr[index]
 
 
@@ -41,7 +40,7 @@ let _cookiesArr = ['']
       }
       // 获取
       await getState()
-      // await SendMsg($.logs)
+      await SendMsg($.logs)
     }
   }
 
@@ -104,7 +103,7 @@ async function getState () {
       }
       if (sxsyts >1){
         $.log(`车辆【${bzclxxItem.hphm}】 六环外还可行驶 ${sxsyts} 天 `)
-        return
+        return false
       }
       $.log(`车辆【${bzclxxItem.hphm}】 准备申请六环${jjzzl == "01"?'内':'外'}`)
       let vId = bzclxxItem.vId;
@@ -156,7 +155,9 @@ async function getState () {
 
   } catch (error) {
     console.error(error)
+    return false
   }
+  return true
 }
 
 async function applyVehicleCheck (params) {
@@ -242,7 +243,7 @@ function randomInt (min = 1000, max = 5000) {
 }
 
 async function sleep (max) {
-  let random = randomInt(1000, max * 1000)
+  let random = randomInt(200, max * 1000)
   // console.log(`随机延迟${random}ms`)
   await $.wait(random)
 }
