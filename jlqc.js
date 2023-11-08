@@ -27,7 +27,7 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
 	
 	if (!(await Envs())) return  //多账号分割 判断变量是否为空  初步处理多账号
 	else {
-		console.log(`\n\n========= 脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========\n`)
+		$.log(`\n\n========= 脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========\n`)
 		$.log(`======== 共找到 ${_cookiesArr.length} 个账号 ========`)
 		for (let index = 0; index < _cookiesArr.length; index++) {
 			let num = index + 1
@@ -75,7 +75,7 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
 
 // async function getToken(iamId,mobile) {
 //     let res = await request('post', `https://evun.geely.com/mp/silentLogin?iamId=${getSing2(iamId)}&mobile=${getSing2(mobile)}`)
-//     console.log(res)
+//     $.log(res)
 //     return res.data.token
 // }
 
@@ -107,7 +107,7 @@ async function show_msg() {
 	})
 	
 	if (res.code == 'success') {
-		let log = `${new Date().getMonth() + 1}月 已签到${res.data.signUserSign.length} 天 `
+		let log = `${new Date().getMonth() + 1}月 已签到${res.data.signUserSign.length} 天 连续签到 ${res.data.continuousSignDay} 天 `
 		$.log(log)
 	}
 	await request('get', available, {})
@@ -227,7 +227,7 @@ async function renwu(title, data) {
 					axios.defaults.headers['x-data-sign'] = getSing(data2).toString()
 					res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', data2)
 					success = res.code
-					console.log(res)
+					$.log(`给文章 ${wenId} 评论 ${success}`)
 					await sleep(1)
 				}
 				break
@@ -238,7 +238,6 @@ async function renwu(title, data) {
 					"pageNum": 1,
 					"followQueryType": "1"
 				})
-				console.log(res)
 				for (let i = 0; i < 3; i++) {
 					let dianzan = resList.data.list[randomInt(0, 5)].id
 					res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
@@ -246,14 +245,14 @@ async function renwu(title, data) {
 						"sourceId": dianzan,
 						"sourceType": "2"
 					})
-					console.log(res)
+					$.log(`给文章 ${dianzan} 点赞 ${res}`)
 					await sleep(1)
 					res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
 						"flag": false,
 						"sourceId": dianzan,
 						"sourceType": "2"
 					})
-					console.log(res)
+					$.log(`给文章 ${dianzan} 取消点赞 ${res}`)
 					await sleep(1)
 				}
 				break
@@ -271,9 +270,11 @@ async function renwu(title, data) {
 				});
 				let circleId = res.data.list[randomInt(0, 5)].id
 				res = await request('post', 'https://app.geely.com/api/v2/circle/join', {"circleId": circleId});
+				$.log(`加入圈子 ${circleId} ${res}`)
 				await sleep(2)
 				success = res.code
 				res = await request('post', 'https://app.geely.com/api/v2/circle/quitCircle', {"circleId": circleId})
+				$.log(`退出圈子 ${circleId} ${res}`)
 				await sleep(2)
 				break
 			// 伙伴店铺打卡
@@ -400,48 +401,13 @@ function getSing(_0x31a276) {
 	}
 }
 
-function getSing2(_0x1e49b3, _0x2443dd) {
-	let _0x2566f6 = _0x4fe9('f');
-	try {
-		if (_0x2443dd) {
-			if (_0x2443dd[_0x4fe9('10')](_0x4fe9('11')) === -0x1) {
-				_0x2443dd = _0x4fe9('12') + _0x2443dd + _0x4fe9('13');
-			}
-			_0x2566f6 = _0x2443dd;
-		}
-		const _0x3eae3c = require(_0x4fe9('14'));
-		const _0x11f164 = new _0x3eae3c(_0x2566f6);
-		_0x11f164[_0x4fe9('15')]({'\x65\x6e\x63\x72\x79\x70\x74\x69\x6f\x6e\x53\x63\x68\x65\x6d\x65': _0x4fe9('16')});
-		const _0x3371ba = _0x11f164[_0x4fe9('17')](_0x1e49b3, _0x4fe9('18'), _0x4fe9('19'));
-		return _0x3371ba[_0x4fe9('c')]();
-	} catch (_0x15d681) {
-		console[_0x4fe9('d')](_0x15d681);
-	}
-};_0xodl = 'jsjiami.com.v6';
-
-async function getUser() {
-	let begin = BigInt(144115205304000001)
-	for (let i = 0; i < 100; i++) {
-		begin++
-		try {
-			let res = await request('post', `https://matrix.geely.com/geely-applet/applet/iam/userInfo`, {
-				"userId": `${begin}`,
-				"token": "eyJraWQiOjEsInR5cCI6IlJTQSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIxMDAxMzIiLCJzY29wZSI6IjEwMDEwfDEwMDAxIiwiaXNzIjoiY29tLnRlbmNlbnQudHJhdmVsLmlvdiIsImV4cCI6MTY4NTc3OTUyMSwianRpIjoiNzJhOTg2NWRkNjAwNGFkNTg2NzYwMDEwOTNkZTc0YmEifQ.a9iqyAnfc2UEOtVudGosWIvDyA8aVE3CQJwIcsVdlkHHS5nDd-OcyZl-4qjVOdt0psIu6HW4K23X4AKsuI69_gZ_IXyJuYZq6kpVUIuKAjOjSut4lKPS1ylYIKUYUBJQyEeFR9rmaPgKtnxWDBNdMpkhLRJmo-Wmb4s7pueoEYbQOweAuiT-gTYnXzu0hs1HrLehCZYuTRaf1WCphyM2r7bmdgIPJnqkNs70kJC2xni7hOYBqy1DxMUPvgE4BEjCYdBf5D4b0lngYuOPcRWU_Zz2dvQC3d4mVPBlXD7j_b4Aq7goeyGWYkjsTq7nLD5ZyCx8oHcurHHmlZfEG0JVvA"
-			})
-			console.log(`${res.data.userId}   ${res.data.mobile}   ${moment.unix(res.data.createTime / 1000).format("YYYY年MM月DD日 HH:mm:ss")} ${res.data.nickName} `)
-		} catch (e) {
-			continue
-		}
-	}
-}
-
 function randomInt(min = 1000, max = 5000) {
 	return Math.round(Math.random() * (max - min) + min);
 }
 
 async function sleep(max) {
-	let random = randomInt(1000, max * 1000)
-	console.log(`随机延迟${random}ms`);
+	let random = randomInt(200, max * 1000)
+	$.log(`随机延迟${random}ms`);
 	await $.wait(random);
 }
 
@@ -503,10 +469,10 @@ async function SendMsg(message) {
 			await notify.sendNotify($.name, message)
 		} else {
 			$.msg(message)
-			console.log(message)
+			$.log(message)
 		}
 	} else {
-		console.log(message)
+		$.log(message)
 	}
 }
 
@@ -549,319 +515,6 @@ function randomNumber(len) {
 	return Date.now() + str
 }
 
-
+// 完整 Env
 // prettier-ignore
-function Env(t, e) {
-	"undefined" != typeof process && JSON.stringify(process.env).indexOf("GITHUB") > -1 && process.exit(0);
-	
-	class s {
-		constructor(t) {
-			this.env = t
-		}
-		
-		send(t, e = "GET") {
-			t = "string" == typeof t ? {url: t} : t;
-			let s = this.get;
-			return "POST" === e && (s = this.post), new Promise((e, i) => {
-				s.call(this, t, (t, s, r) => {
-					t ? i(t) : e(s)
-				})
-			})
-		}
-		
-		get(t) {
-			return this.send.call(this.env, t)
-		}
-		
-		post(t) {
-			return this.send.call(this.env, t, "POST")
-		}
-	}
-	
-	return new class {
-		constructor(t, e) {
-			this.name = t, this.http = new s(this), this.data = null, this.dataFile = "box.dat", this.logs = [], this.isMute = !1, this.isNeedRewrite = !1, this.logSeparator = "\n", this.startTime = (new Date).getTime(), Object.assign(this, e), this.log("", `\ud83d\udd14${this.name}, \u5f00\u59cb!`)
-		}
-		
-		isNode() {
-			return "undefined" != typeof module && !!module.exports
-		}
-		
-		isQuanX() {
-			return "undefined" != typeof $task
-		}
-		
-		isSurge() {
-			return "undefined" != typeof $httpClient && "undefined" == typeof $loon
-		}
-		
-		isLoon() {
-			return "undefined" != typeof $loon
-		}
-		
-		isShadowrocket() {
-			return "undefined" != typeof $rocket
-		}
-		
-		toObj(t, e = null) {
-			try {
-				return JSON.parse(t)
-			} catch {
-				return e
-			}
-		}
-		
-		toStr(t, e = null) {
-			try {
-				return JSON.stringify(t)
-			} catch {
-				return e
-			}
-		}
-		
-		getjson(t, e) {
-			let s = e;
-			const i = this.getdata(t);
-			if (i) try {
-				s = JSON.parse(this.getdata(t))
-			} catch {
-			}
-			return s
-		}
-		
-		setjson(t, e) {
-			try {
-				return this.setdata(JSON.stringify(t), e)
-			} catch {
-				return !1
-			}
-		}
-		
-		getScript(t) {
-			return new Promise(e => {
-				this.get({url: t}, (t, s, i) => e(i))
-			})
-		}
-		
-		runScript(t, e) {
-			return new Promise(s => {
-				let i = this.getdata("@chavy_boxjs_userCfgs.httpapi");
-				i = i ? i.replace(/\n/g, "").trim() : i;
-				let r = this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");
-				r = r ? 1 * r : 20, r = e && e.timeout ? e.timeout : r;
-				const [o, h] = i.split("@"), a = {
-					url: `http://${h}/v1/scripting/evaluate`,
-					body: {script_text: t, mock_type: "cron", timeout: r},
-					headers: {"X-Key": o, Accept: "*/*"}
-				};
-				this.post(a, (t, e, i) => s(i))
-			}).catch(t => this.logErr(t))
-		}
-		
-		loaddata() {
-			if (!this.isNode()) return {};
-			{
-				this.fs = this.fs ? this.fs : require("fs"), this.path = this.path ? this.path : require("path");
-				const t = this.path.resolve(this.dataFile), e = this.path.resolve(process.cwd(), this.dataFile),
-					s = this.fs.existsSync(t), i = !s && this.fs.existsSync(e);
-				if (!s && !i) return {};
-				{
-					const i = s ? t : e;
-					try {
-						return JSON.parse(this.fs.readFileSync(i))
-					} catch (t) {
-						return {}
-					}
-				}
-			}
-		}
-		
-		writedata() {
-			if (this.isNode()) {
-				this.fs = this.fs ? this.fs : require("fs"), this.path = this.path ? this.path : require("path");
-				const t = this.path.resolve(this.dataFile), e = this.path.resolve(process.cwd(), this.dataFile),
-					s = this.fs.existsSync(t), i = !s && this.fs.existsSync(e), r = JSON.stringify(this.data);
-				s ? this.fs.writeFileSync(t, r) : i ? this.fs.writeFileSync(e, r) : this.fs.writeFileSync(t, r)
-			}
-		}
-		
-		lodash_get(t, e, s) {
-			const i = e.replace(/\[(\d+)\]/g, ".$1").split(".");
-			let r = t;
-			for (const t of i) if (r = Object(r)[t], void 0 === r) return s;
-			return r
-		}
-		
-		lodash_set(t, e, s) {
-			return Object(t) !== t ? t : (Array.isArray(e) || (e = e.toString().match(/[^.[\]]+/g) || []), e.slice(0, -1).reduce((t, s, i) => Object(t[s]) === t[s] ? t[s] : t[s] = Math.abs(e[i + 1]) >> 0 == +e[i + 1] ? [] : {}, t)[e[e.length - 1]] = s, t)
-		}
-		
-		getdata(t) {
-			let e = this.getval(t);
-			if (/^@/.test(t)) {
-				const [, s, i] = /^@(.*?)\.(.*?)$/.exec(t), r = s ? this.getval(s) : "";
-				if (r) try {
-					const t = JSON.parse(r);
-					e = t ? this.lodash_get(t, i, "") : e
-				} catch (t) {
-					e = ""
-				}
-			}
-			return e
-		}
-		
-		setdata(t, e) {
-			let s = !1;
-			if (/^@/.test(e)) {
-				const [, i, r] = /^@(.*?)\.(.*?)$/.exec(e), o = this.getval(i),
-					h = i ? "null" === o ? null : o || "{}" : "{}";
-				try {
-					const e = JSON.parse(h);
-					this.lodash_set(e, r, t), s = this.setval(JSON.stringify(e), i)
-				} catch (e) {
-					const o = {};
-					this.lodash_set(o, r, t), s = this.setval(JSON.stringify(o), i)
-				}
-			} else s = this.setval(t, e);
-			return s
-		}
-		
-		getval(t) {
-			return this.isSurge() || this.isLoon() ? $persistentStore.read(t) : this.isQuanX() ? $prefs.valueForKey(t) : this.isNode() ? (this.data = this.loaddata(), this.data[t]) : this.data && this.data[t] || null
-		}
-		
-		setval(t, e) {
-			return this.isSurge() || this.isLoon() ? $persistentStore.write(t, e) : this.isQuanX() ? $prefs.setValueForKey(t, e) : this.isNode() ? (this.data = this.loaddata(), this.data[e] = t, this.writedata(), !0) : this.data && this.data[e] || null
-		}
-		
-		initGotEnv(t) {
-			this.got = this.got ? this.got : require("got"), this.cktough = this.cktough ? this.cktough : require("tough-cookie"), this.ckjar = this.ckjar ? this.ckjar : new this.cktough.CookieJar, t && (t.headers = t.headers ? t.headers : {}, void 0 === t.headers.Cookie && void 0 === t.cookieJar && (t.cookieJar = this.ckjar))
-		}
-		
-		get(t, e = (() => {
-		})) {
-			t.headers && (delete t.headers["Content-Type"], delete t.headers["Content-Length"]), this.isSurge() || this.isLoon() ? (this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {"X-Surge-Skip-Scripting": !1})), $httpClient.get(t, (t, s, i) => {
-				!t && s && (s.body = i, s.statusCode = s.status), e(t, s, i)
-			})) : this.isQuanX() ? (this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {hints: !1})), $task.fetch(t).then(t => {
-				const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-				e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-			}, t => e(t))) : this.isNode() && (this.initGotEnv(t), this.got(t).on("redirect", (t, e) => {
-				try {
-					if (t.headers["set-cookie"]) {
-						const s = t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();
-						s && this.ckjar.setCookieSync(s, null), e.cookieJar = this.ckjar
-					}
-				} catch (t) {
-					this.logErr(t)
-				}
-			}).then(t => {
-				const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-				e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-			}, t => {
-				const {message: s, response: i} = t;
-				e(s, i, i && i.body)
-			}))
-		}
-		
-		post(t, e = (() => {
-		})) {
-			const s = t.method ? t.method.toLocaleLowerCase() : "post";
-			if (t.body && t.headers && !t.headers["Content-Type"] && (t.headers["Content-Type"] = "application/x-www-form-urlencoded"), t.headers && delete t.headers["Content-Length"], this.isSurge() || this.isLoon()) this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {"X-Surge-Skip-Scripting": !1})), $httpClient[s](t, (t, s, i) => {
-				!t && s && (s.body = i, s.statusCode = s.status), e(t, s, i)
-			}); else if (this.isQuanX()) t.method = s, this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {hints: !1})), $task.fetch(t).then(t => {
-				const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-				e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-			}, t => e(t)); else if (this.isNode()) {
-				this.initGotEnv(t);
-				const {url: i, ...r} = t;
-				this.got[s](i, r).then(t => {
-					const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-					e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-				}, t => {
-					const {message: s, response: i} = t;
-					e(s, i, i && i.body)
-				})
-			}
-		}
-		
-		put(t, e = (() => {
-		})) {
-			const s = t.method ? t.method.toLocaleLowerCase() : "put";
-			if (t.body && t.headers && !t.headers["Content-Type"] && (t.headers["Content-Type"] = "application/x-www-form-urlencoded"), t.headers && delete t.headers["Content-Length"], this.isSurge() || this.isLoon()) this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, {"X-Surge-Skip-Scripting": !1})), $httpClient[s](t, (t, s, i) => {
-				!t && s && (s.body = i, s.statusCode = s.status), e(t, s, i)
-			}); else if (this.isQuanX()) t.method = s, this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, {hints: !1})), $task.fetch(t).then(t => {
-				const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-				e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-			}, t => e(t)); else if (this.isNode()) {
-				this.initGotEnv(t);
-				const {url: i, ...r} = t;
-				this.got[s](i, r).then(t => {
-					const {statusCode: s, statusCode: i, headers: r, body: o} = t;
-					e(null, {status: s, statusCode: i, headers: r, body: o}, o)
-				}, t => {
-					const {message: s, response: i} = t;
-					e(s, i, i && i.body)
-				})
-			}
-		}
-		
-		time(t, e = null) {
-			const s = e ? new Date(e) : new Date;
-			let i = {
-				"M+": s.getMonth() + 1,
-				"d+": s.getDate(),
-				"H+": s.getHours(),
-				"m+": s.getMinutes(),
-				"s+": s.getSeconds(),
-				"q+": Math.floor((s.getMonth() + 3) / 3),
-				S: s.getMilliseconds()
-			};
-			/(y+)/.test(t) && (t = t.replace(RegExp.$1, (s.getFullYear() + "").substr(4 - RegExp.$1.length)));
-			for (let e in i) new RegExp("(" + e + ")").test(t) && (t = t.replace(RegExp.$1, 1 == RegExp.$1.length ? i[e] : ("00" + i[e]).substr(("" + i[e]).length)));
-			return t
-		}
-		
-		msg(e = t, s = "", i = "", r) {
-			const o = t => {
-				if (!t) return t;
-				if ("string" == typeof t) return this.isLoon() ? t : this.isQuanX() ? {"open-url": t} : this.isSurge() ? {url: t} : void 0;
-				if ("object" == typeof t) {
-					if (this.isLoon()) {
-						let e = t.openUrl || t.url || t["open-url"], s = t.mediaUrl || t["media-url"];
-						return {openUrl: e, mediaUrl: s}
-					}
-					if (this.isQuanX()) {
-						let e = t["open-url"] || t.url || t.openUrl, s = t["media-url"] || t.mediaUrl;
-						return {"open-url": e, "media-url": s}
-					}
-					if (this.isSurge()) {
-						let e = t.url || t.openUrl || t["open-url"];
-						return {url: e}
-					}
-				}
-			};
-			if (this.isMute || (this.isSurge() || this.isLoon() ? $notification.post(e, s, i, o(r)) : this.isQuanX() && $notify(e, s, i, o(r))), !this.isMuteLog) {
-				let t = ["", "==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];
-				t.push(e), s && t.push(s), i && t.push(i), console.log(t.join("\n")), this.logs = this.logs.concat(t)
-			}
-		}
-		
-		log(...t) {
-			t.length > 0 && (this.logs = [...this.logs, ...t]), console.log(t.join(this.logSeparator))
-		}
-		
-		logErr(t, e) {
-			const s = !this.isSurge() && !this.isQuanX() && !this.isLoon();
-			s ? this.log("", `\u2757\ufe0f${this.name}, \u9519\u8bef!`, t.stack) : this.log("", `\u2757\ufe0f${this.name}, \u9519\u8bef!`, t)
-		}
-		
-		wait(t) {
-			return new Promise(e => setTimeout(e, t))
-		}
-		
-		done(t = {}) {
-			const e = (new Date).getTime(), s = (e - this.startTime) / 1e3;
-			this.log("", `\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${s} \u79d2`), this.log(), (this.isSurge() || this.isQuanX() || this.isLoon()) && $done(t)
-		}
-	}(t, e)
-}
+function Env(t,e){class s{constructor(t){this.env=t}send(t,e="GET"){t="string"==typeof t?{url:t}:t;let s=this.get;return"POST"===e&&(s=this.post),new Promise((e,i)=>{s.call(this,t,(t,s,r)=>{t?i(t):e(s)})})}get(t){return this.send.call(this.env,t)}post(t){return this.send.call(this.env,t,"POST")}}return new class{constructor(t,e){this.name=t,this.http=new s(this),this.data=null,this.dataFile="box.dat",this.logs=[],this.isMute=!1,this.isNeedRewrite=!1,this.logSeparator="\n",this.encoding="utf-8",this.startTime=(new Date).getTime(),Object.assign(this,e),this.log("",`\ud83d\udd14${this.name}, \u5f00\u59cb!`)}isNode(){return"undefined"!=typeof module&&!!module.exports}isQuanX(){return"undefined"!=typeof $task}isSurge(){return"undefined"!=typeof $httpClient&&"undefined"==typeof $loon}isLoon(){return"undefined"!=typeof $loon}isShadowrocket(){return"undefined"!=typeof $rocket}isStash(){return"undefined"!=typeof $environment&&$environment["stash-version"]}toObj(t,e=null){try{return JSON.parse(t)}catch{return e}}toStr(t,e=null){try{return JSON.stringify(t)}catch{return e}}getjson(t,e){let s=e;const i=this.getdata(t);if(i)try{s=JSON.parse(this.getdata(t))}catch{}return s}setjson(t,e){try{return this.setdata(JSON.stringify(t),e)}catch{return!1}}getScript(t){return new Promise(e=>{this.get({url:t},(t,s,i)=>e(i))})}runScript(t,e){return new Promise(s=>{let i=this.getdata("@chavy_boxjs_userCfgs.httpapi");i=i?i.replace(/\n/g,"").trim():i;let r=this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout");r=r?1*r:20,r=e&&e.timeout?e.timeout:r;const[o,a]=i.split("@"),n={url:`http://${a}/v1/scripting/evaluate`,body:{script_text:t,mock_type:"cron",timeout:r},headers:{"X-Key":o,Accept:"*/*"}};this.post(n,(t,e,i)=>s(i))}).catch(t=>this.logErr(t))}loaddata(){if(!this.isNode())return{};{this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e);if(!s&&!i)return{};{const i=s?t:e;try{return JSON.parse(this.fs.readFileSync(i))}catch(t){return{}}}}}writedata(){if(this.isNode()){this.fs=this.fs?this.fs:require("fs"),this.path=this.path?this.path:require("path");const t=this.path.resolve(this.dataFile),e=this.path.resolve(process.cwd(),this.dataFile),s=this.fs.existsSync(t),i=!s&&this.fs.existsSync(e),r=JSON.stringify(this.data);s?this.fs.writeFileSync(t,r):i?this.fs.writeFileSync(e,r):this.fs.writeFileSync(t,r)}}lodash_get(t,e,s){const i=e.replace(/\[(\d+)\]/g,".$1").split(".");let r=t;for(const t of i)if(r=Object(r)[t],void 0===r)return s;return r}lodash_set(t,e,s){return Object(t)!==t?t:(Array.isArray(e)||(e=e.toString().match(/[^.[\]]+/g)||[]),e.slice(0,-1).reduce((t,s,i)=>Object(t[s])===t[s]?t[s]:t[s]=Math.abs(e[i+1])>>0==+e[i+1]?[]:{},t)[e[e.length-1]]=s,t)}getdata(t){let e=this.getval(t);if(/^@/.test(t)){const[,s,i]=/^@(.*?)\.(.*?)$/.exec(t),r=s?this.getval(s):"";if(r)try{const t=JSON.parse(r);e=t?this.lodash_get(t,i,""):e}catch(t){e=""}}return e}setdata(t,e){let s=!1;if(/^@/.test(e)){const[,i,r]=/^@(.*?)\.(.*?)$/.exec(e),o=this.getval(i),a=i?"null"===o?null:o||"{}":"{}";try{const e=JSON.parse(a);this.lodash_set(e,r,t),s=this.setval(JSON.stringify(e),i)}catch(e){const o={};this.lodash_set(o,r,t),s=this.setval(JSON.stringify(o),i)}}else s=this.setval(t,e);return s}getval(t){return this.isSurge()||this.isLoon()?$persistentStore.read(t):this.isQuanX()?$prefs.valueForKey(t):this.isNode()?(this.data=this.loaddata(),this.data[t]):this.data&&this.data[t]||null}setval(t,e){return this.isSurge()||this.isLoon()?$persistentStore.write(t,e):this.isQuanX()?$prefs.setValueForKey(t,e):this.isNode()?(this.data=this.loaddata(),this.data[e]=t,this.writedata(),!0):this.data&&this.data[e]||null}initGotEnv(t){this.got=this.got?this.got:require("got"),this.cktough=this.cktough?this.cktough:require("tough-cookie"),this.ckjar=this.ckjar?this.ckjar:new this.cktough.CookieJar,t&&(t.headers=t.headers?t.headers:{},void 0===t.headers.Cookie&&void 0===t.cookieJar&&(t.cookieJar=this.ckjar))}get(t,e=(()=>{})){if(t.headers&&(delete t.headers["Content-Type"],delete t.headers["Content-Length"]),this.isSurge()||this.isLoon())this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient.get(t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status?s.status:s.statusCode,s.status=s.statusCode),e(t,s,i)});else if(this.isQuanX())this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t&&t.error||"UndefinedError"));else if(this.isNode()){let s=require("iconv-lite");this.initGotEnv(t),this.got(t).on("redirect",(t,e)=>{try{if(t.headers["set-cookie"]){const s=t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString();s&&this.ckjar.setCookieSync(s,null),e.cookieJar=this.ckjar}}catch(t){this.logErr(t)}}).then(t=>{const{statusCode:i,statusCode:r,headers:o,rawBody:a}=t,n=s.decode(a,this.encoding);e(null,{status:i,statusCode:r,headers:o,rawBody:a,body:n},n)},t=>{const{message:i,response:r}=t;e(i,r,r&&s.decode(r.rawBody,this.encoding))})}}post(t,e=(()=>{})){const s=t.method?t.method.toLocaleLowerCase():"post";if(t.body&&t.headers&&!t.headers["Content-Type"]&&(t.headers["Content-Type"]="application/x-www-form-urlencoded"),t.headers&&delete t.headers["Content-Length"],this.isSurge()||this.isLoon())this.isSurge()&&this.isNeedRewrite&&(t.headers=t.headers||{},Object.assign(t.headers,{"X-Surge-Skip-Scripting":!1})),$httpClient[s](t,(t,s,i)=>{!t&&s&&(s.body=i,s.statusCode=s.status?s.status:s.statusCode,s.status=s.statusCode),e(t,s,i)});else if(this.isQuanX())t.method=s,this.isNeedRewrite&&(t.opts=t.opts||{},Object.assign(t.opts,{hints:!1})),$task.fetch(t).then(t=>{const{statusCode:s,statusCode:i,headers:r,body:o}=t;e(null,{status:s,statusCode:i,headers:r,body:o},o)},t=>e(t&&t.error||"UndefinedError"));else if(this.isNode()){let i=require("iconv-lite");this.initGotEnv(t);const{url:r,...o}=t;this.got[s](r,o).then(t=>{const{statusCode:s,statusCode:r,headers:o,rawBody:a}=t,n=i.decode(a,this.encoding);e(null,{status:s,statusCode:r,headers:o,rawBody:a,body:n},n)},t=>{const{message:s,response:r}=t;e(s,r,r&&i.decode(r.rawBody,this.encoding))})}}time(t,e=null){const s=e?new Date(e):new Date;let i={"M+":s.getMonth()+1,"d+":s.getDate(),"H+":s.getHours(),"m+":s.getMinutes(),"s+":s.getSeconds(),"q+":Math.floor((s.getMonth()+3)/3),S:s.getMilliseconds()};/(y+)/.test(t)&&(t=t.replace(RegExp.$1,(s.getFullYear()+"").substr(4-RegExp.$1.length)));for(let e in i)new RegExp("("+e+")").test(t)&&(t=t.replace(RegExp.$1,1==RegExp.$1.length?i[e]:("00"+i[e]).substr((""+i[e]).length)));return t}msg(e=t,s="",i="",r){const o=t=>{if(!t)return t;if("string"==typeof t)return this.isLoon()?t:this.isQuanX()?{"open-url":t}:this.isSurge()?{url:t}:void 0;if("object"==typeof t){if(this.isLoon()){let e=t.openUrl||t.url||t["open-url"],s=t.mediaUrl||t["media-url"];return{openUrl:e,mediaUrl:s}}if(this.isQuanX()){let e=t["open-url"]||t.url||t.openUrl,s=t["media-url"]||t.mediaUrl,i=t["update-pasteboard"]||t.updatePasteboard;return{"open-url":e,"media-url":s,"update-pasteboard":i}}if(this.isSurge()){let e=t.url||t.openUrl||t["open-url"];return{url:e}}}};if(this.isMute||(this.isSurge()||this.isLoon()?$notification.post(e,s,i,o(r)):this.isQuanX()&&$notify(e,s,i,o(r))),!this.isMuteLog){let t=["","==============\ud83d\udce3\u7cfb\u7edf\u901a\u77e5\ud83d\udce3=============="];t.push(e),s&&t.push(s),i&&t.push(i),console.log(t.join("\n")),this.logs=this.logs.concat(t)}}log(...t){t.length>0&&(this.logs=[...this.logs,...t]),console.log(t.join(this.logSeparator))}logErr(t,e){const s=!this.isSurge()&&!this.isQuanX()&&!this.isLoon();s?this.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t.stack):this.log("",`\u2757\ufe0f${this.name}, \u9519\u8bef!`,t)}wait(t){return new Promise(e=>setTimeout(e,t))}done(t={}){const e=(new Date).getTime(),s=(e-this.startTime)/1e3;this.log("",`\ud83d\udd14${this.name}, \u7ed3\u675f! \ud83d\udd5b ${s} \u79d2`),this.log(),this.isSurge()||this.isQuanX()||this.isLoon()?$done(t):this.isNode()&&process.exit(1)}}(t,e)}
