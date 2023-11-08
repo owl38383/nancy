@@ -66,8 +66,10 @@ function taskUrl(url = "",data={}) {
 
   let HTTP_PROXY_HOST = ''
   let HTTP_PROXY_PORT = ''
-  if (process.env.TG_PROXY_HOST) HTTP_PROXY_HOST = process.env.HTTP_PROXY_HOST;
+  let HTTP_PROXY_AUTH = ''
+  if (process.env.HTTP_PROXY_HOST) HTTP_PROXY_HOST = process.env.HTTP_PROXY_HOST;
   if (process.env.HTTP_PROXY_PORT) HTTP_PROXY_PORT = process.env.HTTP_PROXY_PORT;
+  if (process.env.HTTP_PROXY_AUTH) HTTP_PROXY_AUTH = process.env.HTTP_PROXY_AUTH;
 
   if (HTTP_PROXY_HOST && HTTP_PROXY_PORT) {
     const tunnel = require("tunnel");
@@ -76,6 +78,7 @@ function taskUrl(url = "",data={}) {
         proxy: {
           host: HTTP_PROXY_HOST,
           port: HTTP_PROXY_PORT * 1,
+          proxyAuth: HTTP_PROXY_AUTH
         }
       })
     }
