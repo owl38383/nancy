@@ -157,7 +157,7 @@ async function getState() {
     }
 
   } catch (error) {
-    console.error(error);
+    $.logErr(error)
     return false;
   }
   return true;
@@ -206,7 +206,7 @@ async function insertApplyRecord(data) {
     let res = await request('post', 'https://jjz.jtgl.beijing.gov.cn/pro/applyRecordController/insertApplyRecord', _params);
     return res.data;
   } catch (error) {
-    console.error(error);
+    $.logErr(error);
   }
   return false;
 }
