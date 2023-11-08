@@ -1,0 +1,266 @@
+/*
+
+cron "22 16 * * *" jdms.js, tag:京东秒杀浏览
+
+*/
+
+//详细说明参考 https://github.com/ccwav/QLScript2.
+
+const $ = new Env('京东秒杀浏览');
+
+let jdSignUrl = 'https://api.nolanstore.cc/sign'
+// const notify = $.isNode() ? require('./sendNotify') : '';
+const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
+let cookiesArr = [], cookie = '';
+if ($.isNode()) {
+  Object.keys(jdCookieNode).forEach((item) => {
+    cookiesArr.push(jdCookieNode[item])
+  })
+  if (process.env.JD_DEBUG && process.env.JD_DEBUG === 'false') console.log = () => {
+  };
+} else {
+  cookiesArr = [$.getdata('CookieJD'), $.getdata('CookieJD2'), ...jsonParse($.getdata('CookiesJD') || "[]").map(item => item.cookie)].filter(item => !!item);
+}
+let msg = []
+!(async () => {
+  if (!cookiesArr[0]) {
+    $.msg($.name, '【提示】请先获取京东账号一cookie\n直接使用NobyDa的京东签到获取', 'https://bean.m.jd.com/bean/signIndex.action', {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
+    return;
+  }
+  for (let i = 0; i < cookiesArr.length; i++) {
+    if (cookiesArr[i]) {
+      cookie = cookiesArr[i];
+      $.UserName = decodeURIComponent(cookie.match(/pt_pin=([^; ]+)(?=;?)/) && cookie.match(/pt_pin=([^; ]+)(?=;?)/)[1])
+      $.index = i + 1;
+      $.beanCount = 0;
+      $.incomeBean = 0;
+      $.expenseBean = 0;
+      $.todayIncomeBean = 0;
+      $.errorMsg = '';
+      $.isLogin = true;
+      $.nickName = '';
+      $.message = '';
+      $.balance = 0;
+      $.expiredBalance = 0;
+	    $.UA=require('./USER_AGENTS').UARAM();
+      //await TotalBean();
+      //console.log(`\n********开始【京东账号${$.index}】${$.nickName || $.UserName}******\n`);
+      if (!$.isLogin) {
+        $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
+
+        if ($.isNode()) {
+          // await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+        }
+        continue
+      }
+      await bean();
+    }
+  }
+})().catch((e) => {/* $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '') */}).finally(() => $.done())
+
+async function bean() {
+	// 秒杀浏览
+	// await huiwan();
+	await seckillViewTask();
+}
+
+// 秒杀浏览
+async function seckillViewTask(){
+	let params = {
+		functionId: "seckillViewTask",
+		appid: "signed_wh5_ihub",
+	};
+	params.body = JSON.stringify({taskType:0})
+	let res = await request('post', 'https://api.m.jd.com/client.action', params);
+	let number =  res.data.taskThreshold - res.data.taskProgress
+	$.log(`秒杀${res.data.awardStatus ?'浏览已完成':''} `)
+	if (res.data.awardStatus) return
+    for (let i = 0; i < number; i++) {
+		params.body = JSON.stringify({skuId:100523444322+i,taskType:1})
+        await request('post', 'https://api.m.jd.com/client.action', params);
+    }
+	params.body = JSON.stringify({taskType:2})
+	await request('post', 'https://api.m.jd.com/client.action', params);
+}
+
+async function huiwan() {
+  let params = {
+    appid: "babelh5",
+    sign: 11,
+    t: 1699427778112,
+    body: {
+      sourceCode: "acetttsign",
+      encryptProjectId: "226udfnoxMAvQ7r1mWK17TvoLWDg",
+      encryptAssignmentId: "4ZFePHhEMCywBQc3GFpLm1TUSY5k",
+      completionFlag: true,
+      itemId: "1",
+      extParam: {
+        forceBot: "1",
+        businessData: { random: "fYBBsBpr" },
+        signStr: "1699427778045~1Uas41NwYc0MDF3SFVXZjk5MQ==.Rn5sblJFf2JgV0NxZikiLgxtYlQgcT4NGEZkY3tXW3krZRhGNhQWEhUiLDZUOw0GACsAHg0VVT0aAToXThwSZQAReDgUVCEMAjs5AAkUFic2Nis=.04b37805~1,1~571549FD6C38C05CF895C9A8DCF3377A43A6410B~1k596sf~C~TRtGXhUObWQeEUNaWxsIaBVQBxQHYBt8BBUBA20YQxVGERsWUgwfC2EYAHseBgJ6GlgeRxUYFF0FHg9iGg9wHwIMeRVTH0MWaxUQVEVaFAMDHxVHRRsIEQYCDwAGAQADAQgABA4ABgwBERsWQVxWEQ0WQk1GR0NAUF8QHxVDU1gQCRVSUE1GR0NBVxseEUdQWBsIaAMHGggABBsGAxULHwYYA2QeEV1eFAMDHxVXRRsIEQ9RBl1XCwFXAl0DUFNRA19RV1RSV1hQC1UAUg9XUgECFBUQXUcWDBtbY19bWFwQHxVAFAMDBQ4NAgsFBAAMBg0HHxVeXRsIEQMCUgwCC1IGBl8GVgQGBwABVQ5WVwoCB1MEBAtXUFJSUlhTVVUDVA4QHxVSRlsQCRV1d0pqWE5VBHV3UXJGZl4FWgBndGkKR2hHbA5nV0JcV2tzAl5zUF5zcnZ1BkF/SVRMeX17A3peb0N9ZQ5DFBUQXUEWDBtzQ0dYUxlxXFpEQ01XQRsUf1dRHRUYFFdTRRUOFAgECw8NDhseEURXRBsIaA8AAhUBCgdpGhtAXBUObRtbY19bWFwDBxsDFBUQWnhnFBUQAgAaBxseEQYGGAgcBxUYFAgECw8NDhseEQMCUgwCC1IGBl8GVgQGBwABVQ5WVwoCB1MEBAtXUFJSUlhTVVUDVA4QHxVVFGQeEV5bVxsIEVFSUF9UVUNAFBUQUl0WDBtHERsWVVAQCRVDBRcHHQUWGhtRVWhCFAMQCg4WGhtQVxUOFEtTXVNbWwRUanV2RXtCQRUYFFRYEQ1vBBUCHwdpGhtQX1hTFAMQAgENDw0ABAACAgoEB0kFc38GXkMNZgADCnpwfHJjAGVGV0NzSnl1CwQcVgRieGxeCgBRBndRZgQNQWhaZWRxdQ1kd2F+AndYS2RyYkFEd1xQdGNcenxsZG8FY2NhR3tKA09+ZXtocVBtXnpmA31wcgkFY051fXVYR1JkT1IAeWRbXF12QAd3XFECdmFTeGljegZ/X0kEfE1fZHp2enp5dXNQcU5fQnxhYlRRUXRkdWYJCxdRBQUBDwhRA0lNGghMTUl2SGpaYWZjZHh2dmFXd3FVfmR8TndjdlBfZW5wYlFyWkF1dmZbZ35KC2BmTnB+dlBXdXtjUGV8dHdkZWBAfn9zWGR1UUpgdHVydXxFXGVxTgFhZFx9Yn1wdnJ8Z2B2cnZ9VHFKaWRxUUphdmJDC0cDXFMFUUpcERsWW0pVEQ0WFEQ=~188otbr",
+        sceneid: "babel_3fJZ27dqd7iAffkm2QRwc1eZwbK6",
+      },
+      activity_id: "3fJZ27dqd7iAffkm2QRwc1eZwbK6",
+      template_id: "00019605",
+      floor_id: "99001723",
+      enc: "F07D09E45F2905D1E3D62290B03463AF90A1EAB4AFC8AFBE3DA6C4BC1309AB3CFE9617545D5FE0B04BB372A1EBC4564DB8F2445ABC3332009555984C0E43A8D1",
+    },
+  };
+  let res = await request(
+    "post",
+    "https://api.m.jd.com/client.action?functionId=doInteractiveAssignment",
+    params
+  );
+  console.log(res);
+}
+
+function isLoginByX1a0He() {
+    return new Promise((resolve) => {
+        const options = {
+            url: 'https://plogin.m.jd.com/cgi-bin/ml/islogin',
+            headers: {
+                "Cookie": cookie,
+                "referer": "https://h5.m.jd.com/",
+                "User-Agent": "jdapp;iPhone;10.1.2;15.0;network/wifi;Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1",
+            },
+        }
+        $.get(options, (err, resp, data) => {
+            try {
+                if (data) {
+                    data = JSON.parse(data);
+                    if (data.islogin === "1") {
+                        console.log(`使用X1a0He写的接口加强检测: Cookie有效\n`)
+                    } else if (data.islogin === "0") {
+                        $.isLogin = false;
+                        console.log(`使用X1a0He写的接口加强检测: Cookie无效\n`)
+                    } else {
+                        console.log(`使用X1a0He写的接口加强检测: 未知返回，不作变更...\n`)
+                        $.error = `${$.nickName} :` + `使用X1a0He写的接口加强检测: 未知返回...\n`
+                    }
+                }
+            } catch (e) {
+              console.log(e);
+            }
+            finally {
+                resolve();
+            }
+        });
+    });
+}
+
+function taskUrl(url = '', data = {}) {
+	return {
+		url: url,
+		form: data,
+		headers: {
+			Host: 'api.m.jd.com',
+        	'Content-Type': 'application/x-www-form-urlencoded',
+			Origin: 'https://pro.m.jd.com',
+			Cookie: cookie,
+			'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA')
+				? $.getdata('JDUA')
+				: 'jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1'),
+		},
+		timeout: 10000,
+	};
+}
+
+async function request(method, url, data) {
+  return new Promise((resolve, reject) => {
+      if (method === 'get') {
+        $.get(taskUrl(url, data), (err, resp, data) => {
+          if (err) {
+            console.log(err);
+            resolve(err);
+          } else {
+            data = JSON.parse(data);
+            resolve(data);
+          }
+        });
+      }
+      if (method === 'post') {
+        $.post(taskUrl(url, data), (err, resp, data) => {
+          if (err) {
+            console.log(err);
+            resolve(err);
+          } else {
+            data = JSON.parse(data);
+            resolve(data);
+          }
+        });
+      }
+  });
+}
+
+function jdSign(fn, body) {
+    let sign = '';
+    let flag = false;
+    try {
+        const fs = require('fs');
+        if (fs.existsSync('./gua_encryption_sign.js')) {
+            const encryptionSign = require('./gua_encryption_sign');
+            sign = encryptionSign.getSign(fn, body)
+        } else {
+            flag = true
+        }
+        sign = sign.data && sign.data.sign && sign.data.sign || ''
+    } catch (e) {
+        flag = true
+    }
+    if (!flag)
+        return sign
+        if (!jdSignUrl.match(/^https?:\/\//)) {
+            console.log('请填写算法url')
+            $.out = true
+                return ''
+        }
+    return new Promise((resolve) => {
+        let url = {
+            url: jdSignUrl,
+            body: `{"fn":"${fn}","body":${body}}`,
+            followRedirect: false,
+            headers: {
+                'Accept': '*/*',
+                "accept-encoding": "gzip, deflate, br",
+                'Content-Type': 'application/json'
+            },
+            timeout: 30000
+        }
+        $.post(url, async(err, resp, data) => {
+            try {
+                data = JSON.parse(data);
+                if (data && data.body) {
+                    if (data.body)
+                        sign = data.body || '';
+                    if (sign != '')
+                        resolve(sign);
+                    else
+                        console.log("签名获取失败.");
+                } else {
+                    console.log("签名获取失败.");
+                }
+            } catch (e) {
+                $.logErr(e, resp);
+            }
+            finally {
+                resolve('')
+            }
+        })
+    })
+}
+
+//#region 固定代码
+function randomInt(min = 1000, max = 5000) {
+  return Math.round(Math.random() * (max - min) + min);
+}
+// prettier-ignore
+async function sleep(a){let n=randomInt(200,1e3*a);await $.wait(n)}
+// prettier-ignore
+Date.prototype.Format=function(t){var e=this,g=t,n={"M+":e.getMonth()+1,"d+":e.getDate(),"D+":e.getDate(),"h+":e.getHours(),"H+":e.getHours(),"m+":e.getMinutes(),"s+":e.getSeconds(),"w+":e.getDay(),"q+":Math.floor((e.getMonth()+3)/3),"S+":e.getMilliseconds()};for(var o in/(y+)/i.test(g)&&(g=g.replace(RegExp.$1,"".concat(e.getFullYear()).substr(4-RegExp.$1.length))),n)if(new RegExp("(".concat(o,")")).test(g)){var a="S+"===o?"000":"00";g=g.replace(RegExp.$1,1==RegExp.$1.length?n[o]:("".concat(a)+n[o]).substr("".concat(n[o]).length))}return g};
+
+// ============================================发送消息============================================ \\
+// prettier-ignore
+async function SendMsg(e){if(e)if(e=e.join("\n"),Notify>0)if($.isNode()){var o=require("./sendNotify");await o.sendNotify($.name,e)}else $.msg(e);else console.log(e)}
+// 完整 Env
+// prettier-ignore
+function Env(t, e) { "undefined" != typeof process && JSON.stringify(process.env).indexOf("GITHUB") > -1 && process.exit(0); class s { constructor(t) { this.env = t } send(t, e = "GET") { t = "string" == typeof t ? { url: t } : t; let s = this.get; return "POST" === e && (s = this.post), new Promise((e, i) => { s.call(this, t, (t, s, r) => { t ? i(t) : e(s) }) }) } get(t) { return this.send.call(this.env, t) } post(t) { return this.send.call(this.env, t, "POST") } } return new class { constructor(t, e) { this.name = t, this.http = new s(this), this.data = null, this.dataFile = "box.dat", this.logs = [], this.isMute = !1, this.isNeedRewrite = !1, this.logSeparator = "\n", this.startTime = (new Date).getTime(), Object.assign(this, e), this.log("", `🔔${this.name}, 开始!`) } isNode() { return "undefined" != typeof module && !!module.exports } isQuanX() { return "undefined" != typeof $task } isSurge() { return "undefined" != typeof $httpClient && "undefined" == typeof $loon } isLoon() { return "undefined" != typeof $loon } toObj(t, e = null) { try { return JSON.parse(t) } catch { return e } } toStr(t, e = null) { try { return JSON.stringify(t) } catch { return e } } getjson(t, e) { let s = e; const i = this.getdata(t); if (i) try { s = JSON.parse(this.getdata(t)) } catch { } return s } setjson(t, e) { try { return this.setdata(JSON.stringify(t), e) } catch { return !1 } } getScript(t) { return new Promise(e => { this.get({ url: t }, (t, s, i) => e(i)) }) } runScript(t, e) { return new Promise(s => { let i = this.getdata("@chavy_boxjs_userCfgs.httpapi"); i = i ? i.replace(/\n/g, "").trim() : i; let r = this.getdata("@chavy_boxjs_userCfgs.httpapi_timeout"); r = r ? 1 * r : 20, r = e && e.timeout ? e.timeout : r; const [o, h] = i.split("@"), n = { url: `http://${h}/v1/scripting/evaluate`, body: { script_text: t, mock_type: "cron", timeout: r }, headers: { "X-Key": o, Accept: "*/*" } }; this.post(n, (t, e, i) => s(i)) }).catch(t => this.logErr(t)) } loaddata() { if (!this.isNode()) return {}; { this.fs = this.fs ? this.fs : require("fs"), this.path = this.path ? this.path : require("path"); const t = this.path.resolve(this.dataFile), e = this.path.resolve(process.cwd(), this.dataFile), s = this.fs.existsSync(t), i = !s && this.fs.existsSync(e); if (!s && !i) return {}; { const i = s ? t : e; try { return JSON.parse(this.fs.readFileSync(i)) } catch (t) { return {} } } } } writedata() { if (this.isNode()) { this.fs = this.fs ? this.fs : require("fs"), this.path = this.path ? this.path : require("path"); const t = this.path.resolve(this.dataFile), e = this.path.resolve(process.cwd(), this.dataFile), s = this.fs.existsSync(t), i = !s && this.fs.existsSync(e), r = JSON.stringify(this.data); s ? this.fs.writeFileSync(t, r) : i ? this.fs.writeFileSync(e, r) : this.fs.writeFileSync(t, r) } } lodash_get(t, e, s) { const i = e.replace(/\[(\d+)\]/g, ".$1").split("."); let r = t; for (const t of i) if (r = Object(r)[t], void 0 === r) return s; return r } lodash_set(t, e, s) { return Object(t) !== t ? t : (Array.isArray(e) || (e = e.toString().match(/[^.[\]]+/g) || []), e.slice(0, -1).reduce((t, s, i) => Object(t[s]) === t[s] ? t[s] : t[s] = Math.abs(e[i + 1]) >> 0 == +e[i + 1] ? [] : {}, t)[e[e.length - 1]] = s, t) } getdata(t) { let e = this.getval(t); if (/^@/.test(t)) { const [, s, i] = /^@(.*?)\.(.*?)$/.exec(t), r = s ? this.getval(s) : ""; if (r) try { const t = JSON.parse(r); e = t ? this.lodash_get(t, i, "") : e } catch (t) { e = "" } } return e } setdata(t, e) { let s = !1; if (/^@/.test(e)) { const [, i, r] = /^@(.*?)\.(.*?)$/.exec(e), o = this.getval(i), h = i ? "null" === o ? null : o || "{}" : "{}"; try { const e = JSON.parse(h); this.lodash_set(e, r, t), s = this.setval(JSON.stringify(e), i) } catch (e) { const o = {}; this.lodash_set(o, r, t), s = this.setval(JSON.stringify(o), i) } } else s = this.setval(t, e); return s } getval(t) { return this.isSurge() || this.isLoon() ? $persistentStore.read(t) : this.isQuanX() ? $prefs.valueForKey(t) : this.isNode() ? (this.data = this.loaddata(), this.data[t]) : this.data && this.data[t] || null } setval(t, e) { return this.isSurge() || this.isLoon() ? $persistentStore.write(t, e) : this.isQuanX() ? $prefs.setValueForKey(t, e) : this.isNode() ? (this.data = this.loaddata(), this.data[e] = t, this.writedata(), !0) : this.data && this.data[e] || null } initGotEnv(t) { this.got = this.got ? this.got : require("got"), this.cktough = this.cktough ? this.cktough : require("tough-cookie"), this.ckjar = this.ckjar ? this.ckjar : new this.cktough.CookieJar, t && (t.headers = t.headers ? t.headers : {}, void 0 === t.headers.Cookie && void 0 === t.cookieJar && (t.cookieJar = this.ckjar)) } get(t, e = (() => { })) { t.headers && (delete t.headers["Content-Type"], delete t.headers["Content-Length"]), this.isSurge() || this.isLoon() ? (this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, { "X-Surge-Skip-Scripting": !1 })), $httpClient.get(t, (t, s, i) => { !t && s && (s.body = i, s.statusCode = s.status), e(t, s, i) })) : this.isQuanX() ? (this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, { hints: !1 })), $task.fetch(t).then(t => { const { statusCode: s, statusCode: i, headers: r, body: o } = t; e(null, { status: s, statusCode: i, headers: r, body: o }, o) }, t => e(t))) : this.isNode() && (this.initGotEnv(t), this.got(t).on("redirect", (t, e) => { try { if (t.headers["set-cookie"]) { const s = t.headers["set-cookie"].map(this.cktough.Cookie.parse).toString(); s && this.ckjar.setCookieSync(s, null), e.cookieJar = this.ckjar } } catch (t) { this.logErr(t) } }).then(t => { const { statusCode: s, statusCode: i, headers: r, body: o } = t; e(null, { status: s, statusCode: i, headers: r, body: o }, o) }, t => { const { message: s, response: i } = t; e(s, i, i && i.body) })) } post(t, e = (() => { })) { if (t.body && t.headers && !t.headers["Content-Type"] && (t.headers["Content-Type"] = "application/x-www-form-urlencoded"), t.headers && delete t.headers["Content-Length"], this.isSurge() || this.isLoon()) this.isSurge() && this.isNeedRewrite && (t.headers = t.headers || {}, Object.assign(t.headers, { "X-Surge-Skip-Scripting": !1 })), $httpClient.post(t, (t, s, i) => { !t && s && (s.body = i, s.statusCode = s.status), e(t, s, i) }); else if (this.isQuanX()) t.method = "POST", this.isNeedRewrite && (t.opts = t.opts || {}, Object.assign(t.opts, { hints: !1 })), $task.fetch(t).then(t => { const { statusCode: s, statusCode: i, headers: r, body: o } = t; e(null, { status: s, statusCode: i, headers: r, body: o }, o) }, t => e(t)); else if (this.isNode()) { this.initGotEnv(t); const { url: s, ...i } = t; this.got.post(s, i).then(t => { const { statusCode: s, statusCode: i, headers: r, body: o } = t; e(null, { status: s, statusCode: i, headers: r, body: o }, o) }, t => { const { message: s, response: i } = t; e(s, i, i && i.body) }) } } time(t, e = null) { const s = e ? new Date(e) : new Date; let i = { "M+": s.getMonth() + 1, "d+": s.getDate(), "H+": s.getHours(), "m+": s.getMinutes(), "s+": s.getSeconds(), "q+": Math.floor((s.getMonth() + 3) / 3), S: s.getMilliseconds() }; /(y+)/.test(t) && (t = t.replace(RegExp.$1, (s.getFullYear() + "").substr(4 - RegExp.$1.length))); for (let e in i) new RegExp("(" + e + ")").test(t) && (t = t.replace(RegExp.$1, 1 == RegExp.$1.length ? i[e] : ("00" + i[e]).substr(("" + i[e]).length))); return t } msg(e = t, s = "", i = "", r) { const o = t => { if (!t) return t; if ("string" == typeof t) return this.isLoon() ? t : this.isQuanX() ? { "open-url": t } : this.isSurge() ? { url: t } : void 0; if ("object" == typeof t) { if (this.isLoon()) { let e = t.openUrl || t.url || t["open-url"], s = t.mediaUrl || t["media-url"]; return { openUrl: e, mediaUrl: s } } if (this.isQuanX()) { let e = t["open-url"] || t.url || t.openUrl, s = t["media-url"] || t.mediaUrl; return { "open-url": e, "media-url": s } } if (this.isSurge()) { let e = t.url || t.openUrl || t["open-url"]; return { url: e } } } }; if (this.isMute || (this.isSurge() || this.isLoon() ? $notification.post(e, s, i, o(r)) : this.isQuanX() && $notify(e, s, i, o(r))), !this.isMuteLog) { let t = ["", "==============📣系统通知📣=============="]; t.push(e), s && t.push(s), i && t.push(i), console.log(t.join("\n")), this.logs = this.logs.concat(t) } } log(...t) { t.length > 0 && (this.logs = [...this.logs, ...t]), console.log(t.join(this.logSeparator)) } logErr(t, e) { const s = !this.isSurge() && !this.isQuanX() && !this.isLoon(); s ? this.log("", `❗️${this.name}, 错误!`, t.stack) : this.log("", `❗️${this.name}, 错误!`, t) } wait(t) { return new Promise(e => setTimeout(e, t)) } done(t = {}) { const e = (new Date).getTime(), s = (e - this.startTime) / 1e3; this.log("", `🔔${this.name}, 结束! 🕛 ${s} 秒`), this.log(), (this.isSurge() || this.isQuanX() || this.isLoon()) && $done(t) } }(t, e) }
