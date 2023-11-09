@@ -53,10 +53,10 @@ let msg = []
         }
         continue
       }
-      await seckillViewTask();
+      try { await seckillViewTask();} catch (e) { }
     }
   }
-})().catch((e) => {/* $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '') */}).finally(() => $.done())
+})().catch((e) => { $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '') }).finally(() => $.done())
 // 秒杀浏览
 async function seckillViewTask() {
   let params = {
@@ -65,6 +65,10 @@ async function seckillViewTask() {
   };
   params.body = JSON.stringify({ taskType: 0 });
   let res = await request("post", "https://api.m.jd.com/client.action", params);
+  if (res.errorCode){
+    $.log(res.errorMessage)
+    return
+  }
   let number = res.data.taskThreshold - res.data.taskProgress;
   $.log(`秒杀${res.data.awardStatus ? "浏览已完成" : "开始浏览"} `);
   if (res.data.awardStatus) return;
