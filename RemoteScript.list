@@ -1,2 +1,2 @@
-cron "25 16 * * *" script-path=https://raw.githubusercontent.com/owl38383/nancy/main/jd_ms.js  tag=京东秒杀
-cron "25 6 * * *" script-path=https://raw.githubusercontent.com/owl38383/nancy/main/bjjj.js  tag=北京交警
+cron "25 16 * * *" script-path=https://raw.githubusercontent.com/owl38383/nancy/main/jd_ms.js , tag=京东秒杀
+cron "25 6 * * *" script-path=https://raw.githubusercontent.com/owl38383/nancy/main/bjjj.js  , tag=北京交警
