@@ -9,7 +9,7 @@ cron "22 16 * * *" jdms.js, tag:京东秒杀浏览
 const $ = new Env('京东秒杀浏览');
 
 let jdSignUrl = 'https://api.nolanstore.cc/sign'
-// const notify = $.isNode() ? require('./sendNotify') : '';
+const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 let cookiesArr = [], cookie = '';
 if ($.isNode()) {
@@ -43,93 +43,39 @@ let msg = []
       $.balance = 0;
       $.expiredBalance = 0;
 	    $.UA=require('./USER_AGENTS').UARAM();
-      //await TotalBean();
       //console.log(`\n********开始【京东账号${$.index}】${$.nickName || $.UserName}******\n`);
       if (!$.isLogin) {
         $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
 
         if ($.isNode()) {
-          // await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+          await notify.sendNotify(`${$.name}cookie已失效 - ${$.UserName}`, `京东账号${$.index} ${$.UserName}\n请重新登录获取cookie`);
+          await notify.sendNotify($.logs);
         }
         continue
       }
-      await bean();
+      await seckillViewTask();
     }
   }
 })().catch((e) => {/* $.log('', `❌ ${$.name}, 失败! 原因: ${e}!`, '') */}).finally(() => $.done())
-
-async function bean() {
-	// 秒杀浏览
-	await huiwan();
-	// await seckillViewTask();
-}
-
 // 秒杀浏览
-async function seckillViewTask(){
-	let params = {
-		functionId: "seckillViewTask",
-		appid: "signed_wh5_ihub",
-	};
-	params.body = JSON.stringify({taskType:0})
-	let res = await request('post', 'https://api.m.jd.com/client.action', params);
-	let number =  res.data.taskThreshold - res.data.taskProgress
-	$.log(`秒杀${res.data.awardStatus ?'浏览已完成':''} `)
-	if (res.data.awardStatus) return
-    for (let i = 0; i < number; i++) {
-		params.body = JSON.stringify({skuId:100523444322+i,taskType:1})
-        await request('post', 'https://api.m.jd.com/client.action', params);
-    }
-	params.body = JSON.stringify({taskType:2})
-	await request('post', 'https://api.m.jd.com/client.action', params);
-}
-
-async function huiwan() {
+async function seckillViewTask() {
   let params = {
-    appid: "babelh5",
-    sign: 11,
-    t: new Date().getTime(),
-    body: JSON.stringify({
-      sourceCode: "acetttsign",
-      encryptProjectId: "226udfnoxMAvQ7r1mWK17TvoLWDg",
-      encryptAssignmentId: "4ZFePHhEMCywBQc3GFpLm1TUSY5k",
-      completionFlag: true,
-      itemId: "1",
-      extParam: {
-        forceBot: "1",
-        businessData: { random: "fYBBsBpr" },
-        signStr: "-1",
-        sceneid: "babel_3fJZ27dqd7iAffkm2QRwc1eZwbK6",
-      },
-      activity_id: "3fJZ27dqd7iAffkm2QRwc1eZwbK6",
-      template_id: "00019605",
-      floor_id: "99001723",
-      enc: "F07D09E45F2905D1E3D62290B03463AF90A1EAB4AFC8AFBE3DA6C4BC1309AB3CFE9617545D5FE0B04BB372A1EBC4564DB8F2445ABC3332009555984C0E43A8D1",
-    }),
+    functionId: "seckillViewTask",
+    appid: "signed_wh5_ihub",
   };
-  let params2 = {
-    appid: "babelh5",
-    sign: 11,
-    t: new Date().getTime(),
-    body: JSON.stringify({
-      sourceCode: "acetttsign",
-      encryptProjectId: "226udfnoxMAvQ7r1mWK17TvoLWDg",
-      encryptAssigmentIds: ["4ZFePHhEMCywBQc3GFpLm1TUSY5k"],
-      ext: {
-        rewardEncryptAssignmentId: "4ZFePHhEMCywBQc3GFpLm1TUSY5k",
-        timesEncryptAssignmentId: "4ZFePHhEMCywBQc3GFpLm1TUSY5k",
-        needNum: 50,
-      },
-    },)
-  };
-
-  let res1 = await request("post", "https://api.m.jd.com/client.action?functionId=queryInteractiveInfo", params2);
-  console.log(res1);
-
-
-  let res = await request("post", "https://api.m.jd.com/client.action?functionId=doInteractiveAssignment", params);
-  console.log(res);
-
-
+  params.body = JSON.stringify({ taskType: 0 });
+  let res = await request("post", "https://api.m.jd.com/client.action", params);
+  let number = res.data.taskThreshold - res.data.taskProgress;
+  $.log(`秒杀${res.data.awardStatus ? "浏览已完成" : "开始浏览"} `);
+  if (res.data.awardStatus) return;
+  for (let i = 0; i < number; i++) {
+    params.body = JSON.stringify({ skuId: 100523444322 + randomInt()+"", taskType: 1 });
+    await $.wait(2000)
+    await request("post", "https://api.m.jd.com/client.action", params);
+  }
+  params.body = JSON.stringify({ taskType: 2 });
+  await request("post", "https://api.m.jd.com/client.action", params);
+  $.log(`秒杀 浏览已完成`);
 }
 
 function isLoginByX1a0He() {
@@ -172,7 +118,7 @@ function taskUrl(url = '', data = {}) {
 		form: data,
 		headers: {
 			Host: 'api.m.jd.com',
-        	'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/x-www-form-urlencoded',
 			Origin: 'https://pro.m.jd.com',
 			Cookie: cookie,
 			'User-Agent': $.isNode() ? (process.env.JD_USER_AGENT ? process.env.JD_USER_AGENT : (require('./USER_AGENTS').USER_AGENT)) : ($.getdata('JDUA')
