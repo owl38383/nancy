@@ -1,0 +1,1 @@
+cron "25 16 * * *" script-path=https://raw.githubusercontent.com/owl38383/nancy/main/jd_ms.js
