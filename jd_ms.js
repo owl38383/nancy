@@ -7,7 +7,6 @@ cron "22 16 * * *" jdms.js, tag:京东秒杀浏览
 //详细说明参考 https://github.com/ccwav/QLScript2.
 
 const $ = new Env('京东秒杀浏览');
-
 let jdSignUrl = 'https://api.nolanstore.cc/sign'
 const notify = $.isNode() ? require('./sendNotify') : '';
 const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
@@ -43,7 +42,7 @@ let msg = []
       $.balance = 0;
       $.expiredBalance = 0;
 	    $.UA=require('./USER_AGENTS').UARAM();
-      //console.log(`\n********开始【京东账号${$.index}】${$.nickName || $.UserName}******\n`);
+      console.log(`\n********开始【京东账号${$.index}】${$.nickName || $.UserName}******\n`);
       if (!$.isLogin) {
         $.msg($.name, `【提示】cookie已失效`, `京东账号${$.index} ${$.nickName || $.UserName}\n请重新登录获取\nhttps://bean.m.jd.com/bean/signIndex.action`, {"open-url": "https://bean.m.jd.com/bean/signIndex.action"});
 
@@ -153,6 +152,7 @@ async function request(method, url, data) {
             resolve(err);
           } else {
             data = JSON.parse(data);
+            console.log(data);
             resolve(data);
           }
         });

@@ -257,7 +257,7 @@ def guafen(uid,token):
 def chaxun(uid,token):
     print('--------福利金查询--------')
     cx = requests.get(url=f'https://rewards.xiaojukeji.com/loyalty_credit/bonus/getWelfareUsage4Wallet?token={token}&city_id=0').json()
-    if 'ok' == cx['errmsg']:
+    if '成功' == cx['errmsg']:
         print(f"账号{uid}现在有福利金：{cx['data']['worth']}（可抵扣{cx['data']['worth']/100}元）\n{cx['data']['recent_expire_time']}过期福利金：{cx['data']['recent_expire_amount']}")
     else:
         print('查询失败')
