@@ -182,32 +182,26 @@ async function createTopicV3 () {
         'contentType': 2,
     }
     axios.defaults.headers['X-Data-Sign'] = getSing(data).toString()
-    await request('post', 'https://app.geely.com/api/v3/topicContent/create', data).then(async res => {
-        $.log(`发布成功 ${res.data}`)
-        return res
+    return await request('post', 'https://app.geely.com/api/v3/topicContent/create', data).then(async res => {
+        if (debug) $.log(`发布成功 ${res.data}`)
+        return res.code
     })
+
 }
 
 // 发布动态
 async function createTopicV1 () {
     let message1 = await yiyan()
-    await request('post', 'https://app.geely.com/api/v2/topicContent/create', {
+    return await request('post', 'https://app.geely.com/api/v2/topicContent/create', {
         'content': message1,
         'contentType': 1,
-    }).then(async res => {
-        let id = res.data
-        $.log(`发布成功 ${res.data}`)
-        return res
     })
-
 }
 
 // 删除动态或长文
 async function deleteTopic (id) {
-    await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
+    return await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
         'id': id,
-    }).then(res => {
-        $.log(`删除成功 ${id}`)
     })
 }
 
@@ -220,24 +214,24 @@ async function likeOrDisLike () {
     })
     for (let i = 0; i < 1; i++) {
         let dianzanId = resList.data.list[randomInt(0, 5)].id
-        let res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
+        if (debug) $.log(`给文章 ${dianzanId} 点赞`)
+        return await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
             'flag': true,
             'sourceId': dianzanId,
             'sourceType': '2',
         })
-        $.log(`给文章 ${dianzanId} 点赞 ${res}`)
+
     }
 }
 
 // 取消点赞
 async function unlikeOrDisLike (dianzanId) {
-    let res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
+    if (debug) $.log(`给文章 ${dianzanId} 取消点赞 ${res}`)
+    return await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
         'flag': false,
         'sourceId': dianzanId,
         'sourceType': '2',
     })
-    $.log(`给文章 ${dianzanId} 取消点赞 ${res}`)
-    return res
 }
 
 // 评论
@@ -257,9 +251,9 @@ async function publisherComment () {
             'type': '2',
             'id': wenId,
         }
+        if (debug) $.log(`给文章 ${wenId} 评论`)
         axios.defaults.headers['x-data-sign'] = getSing(data2).toString()
-        let res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', data2)
-        $.log(`给文章 ${wenId} 评论 ${success}`)
+        return  await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', data2)
     }
 }
 
@@ -276,32 +270,28 @@ async function circleJoin () {
         'categoryId1': '2129',
     })
     let circleId = res.data.list[randomInt(0, 5)].id
-    res = await request('post', 'https://app.geely.com/api/v2/circle/join', { 'circleId': circleId })
-    $.log(`加入圈子 ${circleId} ${res}`)
-    return res
+    if (debug) $.log(`加入圈子 ${circleId}`)
+    return await request('post', 'https://app.geely.com/api/v2/circle/join', { 'circleId': circleId })
 }
 
 // 退出圈子
 async function circleUnJoin (circleId) {
-    let res = await request('post', 'https://app.geely.com/api/v2/circle/quitCircle', { 'circleId': circleId })
-    $.log(`退出圈子 ${circleId} ${res}`)
-    return res
+    if (debug) $.log(`退出圈子 ${circleId}`)
+    return await request('post', 'https://app.geely.com/api/v2/circle/quitCircle', { 'circleId': circleId })
 }
 
 // 体验车控
 async function carControlAction () {
-    let res = await request('get', 'https://app.geely.com/api/v1/growthSystem/badge/carControlAction')
-    $.log(`体验车控 ${res}`)
-    return res
+    return await request('get', 'https://app.geely.com/api/v1/growthSystem/badge/carControlAction')
 }
 
 const renwuMap = {
-    '10556': createTopicV3(),//发布文章
-    '10594': userSign(),//每日签到
-    '10592': publisherComment(), // 发布评论
-    '10591': likeOrDisLike(),// 动态点赞
-    '10590': share(),//转发分享
-    '10589': circleJoin(),// 加入圈子
+    '10556': createTopicV3,//发布文章
+    '10594': userSign,//每日签到
+    '10592': publisherComment, // 发布评论
+    '10591': likeOrDisLike,// 动态点赞
+    '10590': share,//转发分享
+    '10589': circleJoin,// 加入圈子
     '10581': '',// 伙伴店铺打卡
     '10580': '',// 伙伴店铺有效评论
     '10577': '', // 动态被评为种草
@@ -310,7 +300,7 @@ const renwuMap = {
     '10570': '', // 首购有礼
     '10569': '',// 增购有礼
     '10568': '',// 成功预约售后
-    '10567': carControlAction(), // 使用车控功能
+    '10567': carControlAction, // 使用车控功能
     '10566': '',// 体验虚拟车控功能
 }
 
@@ -318,19 +308,18 @@ async function renwu (title, data) {
     $.log(`【${title}】`)
     const rc = await request('post', 'https://app.geely.com/api/v1/point/access', data)
     for (const wzElement of rc.data.dataList) {
+        let taskInfoId = wzElement.taskInfoId
         if (wzElement.isFinish) {
             $.log(`${wzElement.taskName} : 已完成 跳过任务`)
-            continue
-        }
-        if (debug) {
-            $.log(`${wzElement.taskName} ${wzElement.taskInfoId}`)
-        }
-        let taskInfoId = wzElement.taskInfoId
-        if (renwuMap[taskInfoId]){
-            let res  = await renwuMap[taskInfoId]()
-            $.log(res)
+        } else if (renwuMap[taskInfoId]) {
+            let code = '';
+            await renwuMap[taskInfoId]().then(res=>{
+                code = res.code
+            })
+            $.log(`${wzElement.taskName} ${wzElement.taskInfoId} res:: ${code}`)
             await sleep(3)
         }
+
     }
 }
 
@@ -368,160 +357,156 @@ async function getDateNow () {
 
 }
 
-var _0xodl = 'jsjiami.com.v6', _0xodl_ = function () {
-	return ['_0xodl'], _0xebbd = [_0xodl, '\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73', '\x63\x49\x64', '\x75\x61\x74', '\x78\x70\x5a\x70\x36\x34\x53\x74\x38\x50\x4e\x37\x74\x50\x79\x36\x44\x4e\x53\x33\x50\x58\x30\x63\x49\x6a\x46', '\x42\x4c\x71\x6f\x32\x6e\x6d\x6d\x6f\x50\x67\x47\x75\x4a\x74\x46\x44\x57\x6c\x55\x6a\x52\x49\x32\x62\x31\x62', '\x6e\x6f\x77', '\x6b\x65\x79\x73', '\x73\x6f\x72\x74', '\x66\x6f\x72\x45\x61\x63\x68', '\x73\x6c\x69\x63\x65', '\x62\x29\x67\x68\x28\x52\x70\x56\x45\x25\x58\x37\x39\x7e\x7a', '\x30\x5d\x33\x4b\x40\x27\x39\x4d\x4b\x2b\x36\x4a\x66', '\x74\x6f\x53\x74\x72\x69\x6e\x67', '\x6c\x6f\x67', '\x63\x72\x79\x70\x74\x6f\x2d\x6a\x73\x20\u5305\u672a\u5b89\u88c5', '\x2d\x2d\x2d\x2d\x2d\x42\x45\x47\x49\x4e\x20\x50\x55\x42\x4c\x49\x43\x20\x4b\x45\x59\x2d\x2d\x2d\x2d\x2d\x4d\x49\x47\x66\x4d\x41\x30\x47\x43\x53\x71\x47\x53\x49\x62\x33\x44\x51\x45\x42\x41\x51\x55\x41\x41\x34\x47\x4e\x41\x44\x43\x42\x69\x51\x4b\x42\x67\x51\x43\x6a\x67\x45\x47\x4a\x4f\x4f\x30\x70\x49\x50\x52\x58\x6f\x51\x4d\x6e\x39\x55\x46\x59\x54\x6b\x33\x6d\x70\x64\x4e\x62\x43\x39\x43\x71\x33\x4d\x63\x65\x34\x74\x45\x64\x79\x72\x70\x39\x64\x4b\x75\x4d\x71\x66\x6f\x2f\x75\x68\x78\x61\x6e\x58\x4c\x76\x62\x2b\x6e\x44\x79\x58\x34\x6d\x2b\x39\x47\x51\x7a\x77\x6a\x77\x43\x4b\x49\x6e\x78\x42\x38\x63\x34\x6f\x66\x48\x74\x51\x31\x46\x6b\x67\x42\x55\x4b\x70\x7a\x62\x57\x30\x52\x76\x4b\x52\x52\x77\x34\x6f\x30\x42\x65\x62\x33\x62\x57\x4f\x58\x70\x59\x44\x4e\x79\x57\x50\x71\x6c\x6e\x48\x32\x6c\x71\x2b\x47\x74\x33\x31\x36\x72\x52\x72\x70\x71\x57\x59\x71\x63\x37\x48\x62\x2b\x38\x76\x53\x69\x79\x68\x52\x35\x6e\x64\x31\x45\x44\x76\x31\x43\x7a\x51\x49\x44\x41\x51\x41\x42\x2d\x2d\x2d\x2d\x2d\x45\x4e\x44\x20\x50\x55\x42\x4c\x49\x43\x20\x4b\x45\x59\x2d\x2d\x2d\x2d\x2d', '\x69\x6e\x64\x65\x78\x4f\x66', '\x2d\x2d\x2d\x2d\x2d\x42\x45\x47\x49\x4e', '\x2d\x2d\x2d\x2d\x2d\x42\x45\x47\x49\x4e\x20\x50\x55\x42\x4c\x49\x43\x20\x4b\x45\x59\x2d\x2d\x2d\x2d\x2d', '\x2d\x2d\x2d\x2d\x2d\x45\x4e\x44\x20\x50\x55\x42\x4c\x49\x43\x20\x4b\x45\x59\x2d\x2d\x2d\x2d\x2d', '\x6e\x6f\x64\x65\x2d\x72\x73\x61', '\x73\x65\x74\x4f\x70\x74\x69\x6f\x6e\x73', '\x70\x6b\x63\x73\x31', '\x65\x6e\x63\x72\x79\x70\x74', '\x62\x61\x73\x65\x36\x34', '\x75\x74\x66\x38', '\x6a\x73\x6a\x4b\x69\x74\x61\x42\x6d\x5a\x42\x6b\x69\x2e\x4f\x47\x53\x63\x6f\x6d\x46\x2e\x70\x76\x45\x46\x49\x65\x36\x3d\x3d'];
-}();
+function getSing (e) {
+    try {
+        let Pw = ''
+        let { MD5 } = require('crypto-js')
+        e.cId = Pw === 'uat' ? 'xpZp64St8PN7tPy6DNS3PX0cIjF' : 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
+        e.ts = parseInt((Date.now() / 1e3))
 
-function _0x4fe9(_0x380491, _0x1e9801) {
-	_0x380491 = ~~'0x'['concat'](_0x380491['slice'](0x0));
-	var _0x1f9c90 = _0xebbd[_0x380491];
-	return _0x1f9c90;
-};(function (_0xbe7e4e, _0x4498e6) {
-	var _0x1963fb = 0x0;
-	for (_0x4498e6 = _0xbe7e4e['shift'](_0x1963fb >> 0x2); _0x4498e6 && _0x4498e6 !== (_0xbe7e4e['pop'](_0x1963fb >> 0x3) + '')['replace'](/[KtBZBkOGSFpEFIe=]/g, ''); _0x1963fb++) {
-		_0x1963fb = _0x1963fb ^ 0x1308b1;
-	}
-}(_0xebbd, _0x4fe9));
+        // 创建空对象 t，将非空非undefined的属性添加到 t 中
+        const t = {}
+        for (const a in e) {
+            if (e[a] !== '' && e[a] !== null && e[a] !== undefined) {
+                t[a] = e[a]
+            }
+        }
+        // 将 t 中的属性名按字母排序，得到排序后的数组 r
+        let r = Object.keys(t).sort()
 
-function getSing(_0x31a276) {
-	try {
-		let _0x309143 = '';
-		let {MD5} = require(_0x4fe9('0'));
-		_0x31a276[_0x4fe9('1')] = _0x309143 === _0x4fe9('2') ? _0x4fe9('3') : _0x4fe9('4');
-		_0x31a276['\x74\x73'] = parseInt(Date[_0x4fe9('5')]() / 0x3e8);
-		const _0x1bdf89 = {};
-		for (const _0x39ecbb in _0x31a276) {
-			if (_0x31a276[_0x39ecbb] !== '' && _0x31a276[_0x39ecbb] !== null && _0x31a276[_0x39ecbb] !== undefined) {
-				_0x1bdf89[_0x39ecbb] = _0x31a276[_0x39ecbb];
-			}
-		}
-		let _0x417f0c = Object[_0x4fe9('6')](_0x1bdf89)[_0x4fe9('7')]();
-		let _0x1efc89 = '';
-		_0x417f0c[_0x4fe9('8')](_0x3f30d8 => {
-			_0x1efc89 += _0x3f30d8 + '\x3d' + _0x1bdf89[_0x3f30d8] + '\x26';
-		});
-		_0x1efc89 = _0x1efc89[_0x4fe9('9')](0x0, -0x1);
-		_0x1efc89 += _0x309143 === _0x4fe9('2') ? _0x4fe9('a') : _0x4fe9('b');
-		let _0x556102 = MD5(_0x1efc89)[_0x4fe9('c')]();
-		return _0x556102;
-	} catch (_0x14d5ad) {
-		console[_0x4fe9('d')](_0x4fe9('e'));
-	}
+        // 根据 r 数组中的属性名，拼接属性名和对应的属性值为字符串 i
+        let i = ''
+        r.forEach((key) => {
+            i += key + '=' + t[key] + '&'
+        })
+        i = i.slice(0, -1)
+
+        // 根据条件添加特定字符串进行加密
+        i += Pw === 'uat' ? 'b)gh(RpVE%X79~z' : '0]3K@\'9MK+6Jf'
+
+        // 对字符串 i 进行 MD5 加密操作
+        let o = MD5(i).toString()
+
+        // 返回加密结果
+        return o
+    } catch (e) {
+        console.log('crypto-js 包未安装')
+    }
 }
 
-function randomInt(min = 1000, max = 5000) {
-	return Math.round(Math.random() * (max - min) + min);
+function randomInt (min = 1000, max = 5000) {
+    return Math.round(Math.random() * (max - min) + min)
 }
 
-async function sleep(max) {
-	let random = randomInt(200, max * 1000)
-	$.log(`随机延迟${random}ms`);
-	await $.wait(random);
+async function sleep (max) {
+    let random = randomInt(200, max * 1000)
+    await $.wait(random)
 }
 
 Date.prototype.Format = function (fmt) {
-	var e,
-		n = this,
-		d = fmt,
-		l = {
-			'M+': n.getMonth() + 1,
-			'd+': n.getDate(),
-			'D+': n.getDate(),
-			'h+': n.getHours(),
-			'H+': n.getHours(),
-			'm+': n.getMinutes(),
-			's+': n.getSeconds(),
-			'w+': n.getDay(),
-			'q+': Math.floor((n.getMonth() + 3) / 3),
-			'S+': n.getMilliseconds()
-		};
-	/(y+)/i.test(d) && (d = d.replace(RegExp.$1, ''.concat(n.getFullYear()).substr(4 - RegExp.$1.length)))
-	for (var k in l) {
-		if (new RegExp('('.concat(k, ')')).test(d)) {
-			var t,
-				a = 'S+' === k ? '000' : '00'
-			d = d.replace(RegExp.$1, 1 == RegExp.$1.length ? l[k] : (''.concat(a) + l[k]).substr(''.concat(l[k]).length))
-		}
-	}
-	return d
+    var e,
+      n = this,
+      d = fmt,
+      l = {
+          'M+': n.getMonth() + 1,
+          'd+': n.getDate(),
+          'D+': n.getDate(),
+          'h+': n.getHours(),
+          'H+': n.getHours(),
+          'm+': n.getMinutes(),
+          's+': n.getSeconds(),
+          'w+': n.getDay(),
+          'q+': Math.floor((n.getMonth() + 3) / 3),
+          'S+': n.getMilliseconds(),
+      };
+    /(y+)/i.test(d) && (d = d.replace(RegExp.$1, ''.concat(n.getFullYear()).substr(4 - RegExp.$1.length)))
+    for (var k in l) {
+        if (new RegExp('('.concat(k, ')')).test(d)) {
+            var t,
+              a = 'S+' === k ? '000' : '00'
+            d = d.replace(RegExp.$1, 1 == RegExp.$1.length ? l[k] : (''.concat(a) + l[k]).substr(''.concat(l[k]).length))
+        }
+    }
+    return d
 }
 
 //#region 固定代码
 // ============================================变量检查============================================ \\
-async function Envs() {
-	if (_cookies) {
-		if (Array.isArray(_cookies)) _cookiesArr = _cookies
-		else if (_cookies.indexOf('&') > -1)
-			_cookiesArr = _cookies.split('&')
-		else if (_cookies.indexOf('\n') > -1)
-			_cookiesArr = _cookies.split('\n')
-		else if (_cookies.indexOf('@') > -1)
-			_cookiesArr = _cookies.split('@')
-		else _cookiesArr = [_cookies]
-	} else {
-		$.log(`【${$.name}】：未填写变量 ${envName}`)
-		return
-	}
-	
-	return true
+async function Envs () {
+    if (_cookies) {
+        if (Array.isArray(_cookies)) _cookiesArr = _cookies
+        else if (_cookies.indexOf('&') > -1)
+            _cookiesArr = _cookies.split('&')
+        else if (_cookies.indexOf('\n') > -1)
+            _cookiesArr = _cookies.split('\n')
+        else if (_cookies.indexOf('@') > -1)
+            _cookiesArr = _cookies.split('@')
+        else _cookiesArr = [_cookies]
+    } else {
+        $.log(`【${$.name}】：未填写变量 ${envName}`)
+        return
+    }
+
+    return true
 }
 
 // ============================================发送消息============================================ \\
-async function SendMsg(message) {
-	if (!message)
-		return
-	message = message.join("\n")
-	if (Notify > 0) {
-		if ($.isNode()) {
-			var notify = require('./sendNotify')
-			await notify.sendNotify($.name, message)
-		} else {
-			$.msg(message)
-			$.log(message)
-		}
-	} else {
-		$.log(message)
-	}
+async function SendMsg (message) {
+    if (!message)
+        return
+    message = message.join('\n')
+    if (Notify > 0) {
+        if ($.isNode()) {
+            var notify = require('./sendNotify')
+            await notify.sendNotify($.name, message)
+        } else {
+            $.msg(message)
+            $.log(message)
+        }
+    } else {
+        $.log(message)
+    }
 }
 
-function getRand(min, max) {
-	return parseInt(Math.random() * (max - min)) + min
+function getRand (min, max) {
+    return parseInt(Math.random() * (max - min)) + min
 }
 
-function uuid() {
-	var s = []
-	var hexDigits = '0123456789abcdef'
-	for (var i = 0; i < 36; i++) {
-		s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)
-	}
-	s[14] = '4'
-	s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1)
-	s[8] = s[13] = s[18] = s[23] = '-'
-	var uuid = s.join('')
-	return uuid
+function uuid () {
+    var s = []
+    var hexDigits = '0123456789abcdef'
+    for (var i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1)
+    }
+    s[14] = '4'
+    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1)
+    s[8] = s[13] = s[18] = s[23] = '-'
+    var uuid = s.join('')
+    return uuid
 }
 
-function uuidRandom() {
-	return Math.random().toString(16).slice(2, 10) +
-		Math.random().toString(16).slice(2, 10) +
-		Math.random().toString(16).slice(2, 10) +
-		Math.random().toString(16).slice(2, 10) +
-		Math.random().toString(16).slice(2, 10)
+function uuidRandom () {
+    return Math.random().toString(16).slice(2, 10) +
+      Math.random().toString(16).slice(2, 10) +
+      Math.random().toString(16).slice(2, 10) +
+      Math.random().toString(16).slice(2, 10) +
+      Math.random().toString(16).slice(2, 10)
 }
 
-function random(arr) {
-	return arr[Math.floor(Math.random() * arr.length)]
+function random (arr) {
+    return arr[Math.floor(Math.random() * arr.length)]
 }
 
-function randomNumber(len) {
-	let chars = '0123456789'
-	let maxPos = chars.length
-	let str = ''
-	for (let i = 0; i < len; i++) {
-		str += chars.charAt(Math.floor(Math.random() * maxPos))
-	}
-	return Date.now() + str
+function randomNumber (len) {
+    let chars = '0123456789'
+    let maxPos = chars.length
+    let str = ''
+    for (let i = 0; i < len; i++) {
+        str += chars.charAt(Math.floor(Math.random() * maxPos))
+    }
+    return Date.now() + str
 }
+
 
 // 完整 Env
 // prettier-ignore
