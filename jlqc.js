@@ -16,62 +16,59 @@ const axios = require('axios')
 const moment = require('moment')
 const $ = new Env('吉利汽车签到')
 
-const Notify = 1; //0为关闭通知，1为打开通知,默认为1
-const debug = 0; //0为关闭调试，1为打开调试,默认为0
+const Notify = 1 //0为关闭通知，1为打开通知,默认为1
+const debug = 0 //0为关闭调试，1为打开调试,默认为0
 
 let envName = 'jlqcCookies'
 let _cookies = ($.isNode() ? process.env[envName] : $.getdata(`${envName}`)) || ''
 let _cookiesArr = []
 let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
 !(async () => {
-	
-	if (!(await Envs())) return  //多账号分割 判断变量是否为空  初步处理多账号
-	else {
-		$.log(`\n\n========= 脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========\n`)
-		$.log(`======== 共找到 ${_cookiesArr.length} 个账号 ========`)
-		for (let index = 0; index < _cookiesArr.length; index++) {
-			let num = index + 1
-			$.log(`========= 开始【第 ${num} 个账号】=========`)
-			// msg += ` 【第 ${num} 个账号】`
-			let ck = _cookiesArr[index]
-			let headers = {
-				'Accept': '*/*',
-				'Accept-Encoding': 'gzip, deflate, br',
-				'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
-				'Connection': 'keep-alive',
-				'Content-Type': 'application/json',
-				'token': `${ck}`,
-				'user-agent': 'ji li qi che/3.5.0 (iPhone; iOS 16.5; Scale/3.00)',
-				'platform': 'iOS',
-				'devicesn': '4A742BA3-4467-4111-A094-B931F87A474E',
-				'authority': 'app.geely.com',
-				'origin': 'https://app.geely.com',
-				'referer': 'https://app.geely.com/app-h5/sign-in/?showTitleBar=0&needLogin=1',
-				'cookie': `RANGERS_WEB_ID=user; HWWAFSESID=5ddd47cab52958fcf1; HWWAFSESTIME=${moment().unix()}`,
-				txcookie: 'IOV_ACCOUNT_SESSIONID=; userid=144115205304294815; usersig=AAAAEBD6pN46DFUQga+w6qOjiAHwMFeewVc+IJC2W2RGrZOHcX+4ZLvlKFExGpL9i/Tni0+DuRVAiJmmVX2qxsFTxoFg+xMtDDpRSZh/emCYuC/mr3EQuf5IxTzrSINB8MChhSIB3yzreM375TwZRHB0I/UE3quKnAxQfgzStjj+74PvFKRgIQ0vJ2SLPc62qqvB/TowHrZJTIz5++ZG/BKJq6lh9qEr+X4WuRulgxwQVHcNVf84NTwCDrCXlxdRlQfeftL1czD2JzfneGSy/Upb0i6i8HU='
-			}
-			
-			if (debug) {
-				$.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}`);
-			}
-			axios.defaults.headers = headers;
-			// 签到任务
-			let login = await getLogin();
-			if (login) {
-				await nengliang()
-				await show_msg()
-				await SendMsg($.logs)
-			} else {
-				$.log(`账号${index}已失效`)
-				
-			}
-		}
-	}
-	
-})()
-	.catch((e) => $.logErr(e))
-	.finally(() => $.done())
 
+    if (!(await Envs())) return  //多账号分割 判断变量是否为空  初步处理多账号
+    else {
+        $.log(`\n\n========= 脚本执行 - 北京时间(UTC+8)：${new Date(new Date().getTime() + new Date().getTimezoneOffset() * 60 * 1000 + 8 * 60 * 60 * 1000).toLocaleString()} =========\n`)
+        $.log(`======== 共找到 ${_cookiesArr.length} 个账号 ========`)
+        for (let index = 0; index < _cookiesArr.length; index++) {
+            let num = index + 1
+            $.log(`========= 开始【第 ${num} 个账号】=========`)
+            // msg += ` 【第 ${num} 个账号】`
+            let ck = _cookiesArr[index]
+            let headers = {
+                'Accept': '*/*',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'Accept-Language': 'zh-CN,zh-Hans;q=0.9',
+                'Connection': 'keep-alive',
+                'Content-Type': 'application/json',
+                'token': `${ck}`,
+                'user-agent': 'ji li qi che/3.5.0 (iPhone; iOS 16.5; Scale/3.00)',
+                'platform': 'iOS',
+                'devicesn': '4A742BA3-4467-4111-A094-B931F87A474E',
+                'authority': 'app.geely.com',
+                'origin': 'https://app.geely.com',
+                'referer': 'https://app.geely.com/app-h5/sign-in/?showTitleBar=0&needLogin=1',
+                'cookie': `RANGERS_WEB_ID=user; HWWAFSESID=5ddd47cab52958fcf1; HWWAFSESTIME=${moment().unix()}`,
+                txcookie: 'IOV_ACCOUNT_SESSIONID=; userid=144115205304294815; usersig=AAAAEBD6pN46DFUQga+w6qOjiAHwMFeewVc+IJC2W2RGrZOHcX+4ZLvlKFExGpL9i/Tni0+DuRVAiJmmVX2qxsFTxoFg+xMtDDpRSZh/emCYuC/mr3EQuf5IxTzrSINB8MChhSIB3yzreM375TwZRHB0I/UE3quKnAxQfgzStjj+74PvFKRgIQ0vJ2SLPc62qqvB/TowHrZJTIz5++ZG/BKJq6lh9qEr+X4WuRulgxwQVHcNVf84NTwCDrCXlxdRlQfeftL1czD2JzfneGSy/Upb0i6i8HU=',
+            }
+
+            if (debug) {
+                $.log(` 【debug】 这是你第 ${num} 账号信息:\n ck:${ck}`)
+            }
+            axios.defaults.headers = headers
+            // 签到任务
+            let login = await getLogin()
+            if (login) {
+                await nengliang()
+                await show_msg()
+                await SendMsg($.logs)
+            } else {
+                $.log(`账号${index}已失效`)
+
+            }
+        }
+    }
+
+})().catch((e) => $.logErr(e)).finally(() => $.done())
 
 // async function getToken(iamId,mobile) {
 //     let res = await request('post', `https://evun.geely.com/mp/silentLogin?iamId=${getSing2(iamId)}&mobile=${getSing2(mobile)}`)
@@ -79,285 +76,296 @@ let cid = 'BLqo2nmmoPgGuJtFDWlUjRI2b1b'
 //     return res.data.token
 // }
 
-async function getLogin() {
-	try {
-		let res = await request('get', 'https://app.geely.com/api/v1/user/isLogin');
-		return res.code === 'success'
-	} catch (error) {
-		console.error(error)
-	}
-	return false
+async function getLogin () {
+    try {
+        let res = await request('get', 'https://app.geely.com/api/v1/user/isLogin')
+        return res.code === 'success'
+    } catch (error) {
+        console.error(error)
+    }
+    return false
 }
 
-async function show_msg() {
-	$.log("【当前账户信息】")
-	const available = 'https://app.geely.com/api/v1/point/available'
-	const summary = 'https://app.geely.com/api/v1/growthSystem/energyBody/summary'
-	const getMemberLevelInfo = 'https://app.geely.com/my/getMemberLevelInfo'
-	
-	let total
-	let privilegeNum
-	let availablePoint = total = privilegeNum = 0
-	let res = '';
-	res = await request('post', 'https://app.geely.com/api/v1/userSign/getSignMsg', {
-		data: {
-			'year': new Date().getUTCFullYear(),
-			'month': new Date().getUTCMonth() + 1
-		}
-	})
-	
-	if (res.code == 'success') {
-		let log = `${new Date().getMonth() + 1}月 已签到${res.data.signUserSign.length} 天 连续签到 ${res.data.continuousSignDay} 天 `
-		$.log(log)
-	}
-	await request('get', available, {})
-		.then(json => {
-			if (json.code === 'success') {
-				availablePoint = json.data.availablePoint
-			}
-			return json.code === 'success'
-		})
-		.catch(e => {
-		})
-	
-	await request('get', summary, {})
-		.then(json => {
-			if (json.code === 'success') {
-				total = json.data.total
-			}
-			return json.code === 'success'
-		})
-		.catch(e => {
-		})
-	
-	await request('get', getMemberLevelInfo, {})
-		.then(json => {
-			if (json.code === 'success') {
-				privilegeNum = json.data.privilegeNum
-			}
-			return json.code === 'success'
-		})
-		.catch(e => {
-		})
-	$.log(`吉分：${availablePoint} 能量体 ${total} 当前等级${privilegeNum}`)
+async function show_msg () {
+    $.log('【当前账户信息】')
+    const available = 'https://app.geely.com/api/v1/point/available'
+    const summary = 'https://app.geely.com/api/v1/growthSystem/energyBody/summary'
+    const getMemberLevelInfo = 'https://app.geely.com/my/getMemberLevelInfo'
+
+    let total
+    let privilegeNum
+    let availablePoint = total = privilegeNum = 0
+    let res = ''
+    res = await request('post', 'https://app.geely.com/api/v1/userSign/getSignMsg', {
+        data: {
+            'year': new Date().getUTCFullYear(),
+            'month': new Date().getUTCMonth() + 1,
+        },
+    })
+
+    if (res.code == 'success') {
+        let log = `${new Date().getMonth() + 1}月 已签到${res.data.signUserSign.length} 天 连续签到 ${res.data.continuousSignDay} 天 `
+        $.log(log)
+    }
+    await request('get', available, {}).then(json => {
+        if (json.code === 'success') {
+            availablePoint = json.data.availablePoint
+        }
+        return json.code === 'success'
+    }).catch(e => {
+    })
+
+    await request('get', summary, {}).then(json => {
+        if (json.code === 'success') {
+            total = json.data.total
+        }
+        return json.code === 'success'
+    }).catch(e => {
+    })
+
+    await request('get', getMemberLevelInfo, {}).then(json => {
+        if (json.code === 'success') {
+            privilegeNum = json.data.privilegeNum
+        }
+        return json.code === 'success'
+    }).catch(e => {
+    })
+    $.log(`吉分：${availablePoint} 能量体 ${total} 当前等级${privilegeNum}`)
 }
 
-async function nengliang() {
-	axios.defaults.headers.referer = 'https://app.geely.com/app-h5/grow-up/?showTitleBar=0&needLogin=1&tabsIndex=1'
-	let data = {
-		"classify": 1,
-		"taskClassifyId": 5,
-		"pageIndex": "1",
-		"pageSize": "20"
-	}
-	await renwu("吉分任务", data)
-	data = {
-		"classify": 2,
-		"taskClassifyId": 7,
-		"pageIndex": "1",
-		"pageSize": "20"
-	}
-	data.taskClassifyId = 7
-	await renwu("玩转社区", data)
-	data.taskClassifyId = 8
-	await renwu("人车互联", data)
-	data.taskClassifyId = 9
-	// await renwu("吉友发展",data)
+async function nengliang () {
+    axios.defaults.headers.referer = 'https://app.geely.com/app-h5/grow-up/?showTitleBar=0&needLogin=1&tabsIndex=1'
+    let data = {
+        'classify': 1,
+        'taskClassifyId': 5,
+        'pageIndex': '1',
+        'pageSize': '20',
+    }
+    await renwu('吉分任务', data)
+    data = {
+        'classify': 1,
+        'taskClassifyId': 6,
+        'pageIndex': '1',
+        'pageSize': '20',
+    }
+    await renwu('吉分进阶任务', data)
+    data = {
+        'classify': 2,
+        'taskClassifyId': 7,
+        'pageIndex': '1',
+        'pageSize': '20',
+    }
+    data.taskClassifyId = 7
+    await renwu('玩转社区', data)
+    data.taskClassifyId = 8
+    await renwu('人车互联', data)
+    data.taskClassifyId = 9
+    // await renwu("吉友发展",data)
 }
 
-async function renwu(title, data) {
-	$.log(`【${title}】`)
-	const rc = await request('post', 'https://app.geely.com/api/v1/point/access', data)
-	for (const wzElement of rc.data.dataList) {
-		if (wzElement.isFinish) {
-			$.log(`${wzElement.taskName} : 已完成 跳过任务`)
-			continue
-		}
-		if (debug) {
-			$.log(`${wzElement.taskName} ${wzElement.taskInfoId}`)
-		}
-		let res = ''
-		let success = false;
-		let __message = "";
-		let resList = {}
-		switch (wzElement.taskInfoId) {
-			//发布文章
-			case "10556":
-				let message1 = await yiyan()
-				await request('post', 'https://app.geely.com/api/v2/topicContent/create', {
-					'content': message1,
-					'contentType': 1
-				}).then(async res => {
-					let id = res.data
-					$.log(`发布成功 ${res.data}`)
-					// await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
-					//     'id': id
-					// }).then(res => {
-					//     $.log(`删除成功 ${id}`)
-					// })
-					success = res.code
-					$.log(`文章发布成功`)
-				})
-				break
-			//每日签到
-			case "10594":
-				let data1 = {}
-				axios.defaults.headers['X-Data-Sign'] = getSing(data1).toString()
-				res = await request('post', 'https://app.geely.com/api/v1/userSign/sign', data1)
-				success = res.code
-				__message = res.message
-				break
-			// 发布评论
-			case "10592":
-				let message = await yiyan()
-				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForFollow', {
-					"pageSize": 20,
-					"pageNum": 1,
-					"followQueryType": "1"
-				})
-				
-				for (let i = 0; i < 2; i++) {
-					let wenId = resList.data.list[i].id
-					let data2 = {
-						"content": `${message}`,
-						"parentId": "",
-						"type": "2",
-						"id": wenId,
-					}
-					axios.defaults.headers['x-data-sign'] = getSing(data2).toString()
-					res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', data2)
-					success = res.code
-					$.log(`给文章 ${wenId} 评论 ${success}`)
-					await sleep(1)
-				}
-				break
-			// 动态点赞
-			case "10591":
-				resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForFollow', {
-					"pageSize": 20,
-					"pageNum": 1,
-					"followQueryType": "1"
-				})
-				for (let i = 0; i < 3; i++) {
-					let dianzan = resList.data.list[randomInt(0, 5)].id
-					res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
-						"flag": true,
-						"sourceId": dianzan,
-						"sourceType": "2"
-					})
-					$.log(`给文章 ${dianzan} 点赞 ${res}`)
-					await sleep(1)
-					res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
-						"flag": false,
-						"sourceId": dianzan,
-						"sourceType": "2"
-					})
-					$.log(`给文章 ${dianzan} 取消点赞 ${res}`)
-					await sleep(1)
-				}
-				break
-			//转发分享
-			case "10590":
-				res = await request('post', 'https://app.geely.com/api/v1/share/awardPoint')
-				success = res.code
-				break
-			// 加入圈子
-			case "10589":
-				res = await request('post', 'https://app.geely.com/api/v2/circle/list', {
-					"pageSize": 20,
-					"pageNum": 1,
-					"categoryId1": "2129"
-				});
-				let circleId = res.data.list[randomInt(0, 5)].id
-				res = await request('post', 'https://app.geely.com/api/v2/circle/join', {"circleId": circleId});
-				$.log(`加入圈子 ${circleId} ${res}`)
-				await sleep(2)
-				success = res.code
-				res = await request('post', 'https://app.geely.com/api/v2/circle/quitCircle', {"circleId": circleId})
-				$.log(`退出圈子 ${circleId} ${res}`)
-				await sleep(2)
-				break
-			// 伙伴店铺打卡
-			case "10581":
-				__message = '未开发'
-				continue
-				break
-			// 伙伴店铺有效评论
-			case "10580":
-				__message = '未开发'
-				continue
-				break
-			// 动态被评为种草
-			case "10577":
-				__message = '未开发'
-				continue
-				break
-			// 动态被评为优质
-			case "10576":
-				__message = '未开发'
-				continue
-				break
-			// 试驾体验
-			case "10572":
-				__message = '未开发'
-				continue
-				break
-			// 首购有礼
-			case "10570":
-				__message = '未开发'
-				continue
-				break
-			// 增购有礼
-			case "10569":
-				__message = '未开发'
-				continue
-				break
-			// 成功预约售后
-			case "10568":
-				__message = '未开发'
-				continue
-				break
-			// 使用车控功能
-			case "10567":
-				res = await request('get', 'https://app.geely.com/api/v1/growthSystem/badge/carControlAction')
-				success = res.code
-				break
-			// 体验虚拟车控功能
-			case "10566":
-				__message = '未开发'
-				continue
-				break
-			default:
-				continue
-		}
-		$.log(`${wzElement.taskName} : ${success === 'success' ? '执行完成' : `执行失败/${__message}`}`)
-		await sleep(3)
-	}
+// 签到
+async function userSign () {
+    let data1 = {}
+    axios.defaults.headers['X-Data-Sign'] = getSing(data1).toString()
+    return await request('post', 'https://app.geely.com/api/v1/userSign/sign', data1)
 }
 
-async function request(method, url, data) {
-	return new Promise(async (resolve) => {
-		try {
-			let response = {}
-			if (method === 'get') {
-				response = await axios.get(url, {params: data})
-			}
-			if (method === 'post') {
-				response = await axios.post(url, data)
-			}
-			resolve(response.data)
-		} catch (error) {
-			console.error(error)
-		} finally {
-		}
-	})
+// 发布长文
+async function createTopicV3 () {
+    let message1 = await yiyan()
+    let message2 = await yiyan()
+    let longImgUrl = await bingImg()
+    let data = {
+        'content': message1,
+        'longTitle': message2,
+        'longImgUrl': longImgUrl,
+        'contentType': 2,
+    }
+    axios.defaults.headers['X-Data-Sign'] = getSing(data).toString()
+    await request('post', 'https://app.geely.com/api/v3/topicContent/create', data).then(async res => {
+        $.log(`发布成功 ${res.data}`)
+        return res
+    })
 }
 
-async function yiyan() {
-	let _message = '每日一句话'
-	const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
-	_message = res.data
-	return _message
+// 发布动态
+async function createTopicV1 () {
+    let message1 = await yiyan()
+    await request('post', 'https://app.geely.com/api/v2/topicContent/create', {
+        'content': message1,
+        'contentType': 1,
+    }).then(async res => {
+        let id = res.data
+        $.log(`发布成功 ${res.data}`)
+        return res
+    })
+
+}
+
+// 删除动态或长文
+async function deleteTopic (id) {
+    await request('post', 'https://app.geely.com/api/v2/topicContent/deleteContent', {
+        'id': id,
+    }).then(res => {
+        $.log(`删除成功 ${id}`)
+    })
+}
+
+// 点赞
+async function likeOrDisLike () {
+    let resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForFollow', {
+        'pageSize': 20,
+        'pageNum': 1,
+        'followQueryType': '1',
+    })
+    for (let i = 0; i < 1; i++) {
+        let dianzanId = resList.data.list[randomInt(0, 5)].id
+        let res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
+            'flag': true,
+            'sourceId': dianzanId,
+            'sourceType': '2',
+        })
+        $.log(`给文章 ${dianzanId} 点赞 ${res}`)
+    }
+}
+
+// 取消点赞
+async function unlikeOrDisLike (dianzanId) {
+    let res = await request('post', 'https://app.geely.com/apis/api/v2/like/likeOrDisLike', {
+        'flag': false,
+        'sourceId': dianzanId,
+        'sourceType': '2',
+    })
+    $.log(`给文章 ${dianzanId} 取消点赞 ${res}`)
+    return res
+}
+
+// 评论
+async function publisherComment () {
+    let message = await getDateNow() + '到此一游'
+    let resList = await request('post', 'https://app.geely.com/api/v2/topicContent/queryForFollow', {
+        'pageSize': 20,
+        'pageNum': 1,
+        'followQueryType': '1',
+    })
+
+    for (let i = 0; i < 1; i++) {
+        let wenId = resList.data.list[i].id
+        let data2 = {
+            'content': `${message}`,
+            'parentId': '',
+            'type': '2',
+            'id': wenId,
+        }
+        axios.defaults.headers['x-data-sign'] = getSing(data2).toString()
+        let res = await request('post', 'https://app.geely.com/apis/api/v2/comment/publisherComment', data2)
+        $.log(`给文章 ${wenId} 评论 ${success}`)
+    }
+}
+
+// 转发分享
+async function share () {
+    return await request('post', 'https://app.geely.com/api/v1/share/awardPoint')
+}
+
+// 加入圈子
+async function circleJoin () {
+    let res = await request('post', 'https://app.geely.com/api/v2/circle/list', {
+        'pageSize': 20,
+        'pageNum': 1,
+        'categoryId1': '2129',
+    })
+    let circleId = res.data.list[randomInt(0, 5)].id
+    res = await request('post', 'https://app.geely.com/api/v2/circle/join', { 'circleId': circleId })
+    $.log(`加入圈子 ${circleId} ${res}`)
+    return res
+}
+
+// 退出圈子
+async function circleUnJoin (circleId) {
+    let res = await request('post', 'https://app.geely.com/api/v2/circle/quitCircle', { 'circleId': circleId })
+    $.log(`退出圈子 ${circleId} ${res}`)
+    return res
+}
+
+// 体验车控
+async function carControlAction () {
+    let res = await request('get', 'https://app.geely.com/api/v1/growthSystem/badge/carControlAction')
+    $.log(`体验车控 ${res}`)
+    return res
+}
+
+const renwuMap = {
+    '10556': createTopicV3(),//发布文章
+    '10594': userSign(),//每日签到
+    '10592': publisherComment(), // 发布评论
+    '10591': likeOrDisLike(),// 动态点赞
+    '10590': share(),//转发分享
+    '10589': circleJoin(),// 加入圈子
+    '10581': '',// 伙伴店铺打卡
+    '10580': '',// 伙伴店铺有效评论
+    '10577': '', // 动态被评为种草
+    '10576': '',// 动态被评为优质
+    '10572': '',// 试驾体验
+    '10570': '', // 首购有礼
+    '10569': '',// 增购有礼
+    '10568': '',// 成功预约售后
+    '10567': carControlAction(), // 使用车控功能
+    '10566': '',// 体验虚拟车控功能
+}
+
+async function renwu (title, data) {
+    $.log(`【${title}】`)
+    const rc = await request('post', 'https://app.geely.com/api/v1/point/access', data)
+    for (const wzElement of rc.data.dataList) {
+        if (wzElement.isFinish) {
+            $.log(`${wzElement.taskName} : 已完成 跳过任务`)
+            continue
+        }
+        if (debug) {
+            $.log(`${wzElement.taskName} ${wzElement.taskInfoId}`)
+        }
+        let taskInfoId = wzElement.taskInfoId
+        if (renwuMap[taskInfoId]){
+            let res  = await renwuMap[taskInfoId]()
+            $.log(res)
+            await sleep(3)
+        }
+    }
+}
+
+async function request (method, url, data) {
+    return new Promise(async (resolve) => {
+        try {
+            let response = {}
+            if (method === 'get') {
+                response = await axios.get(url, { params: data })
+            }
+            if (method === 'post') {
+                response = await axios.post(url, data)
+            }
+            resolve(response.data)
+        } catch (error) {
+            console.error(error)
+        } finally {
+        }
+    })
+}
+
+async function yiyan () {
+    const res = await axios.get('https://api.likepoems.com/ana/yiyan/')
+    return res.data
+}
+
+async function bingImg () {
+    const res = await axios.get('https://cn.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1')
+    let urlbase = res.data.images[0].urlbase
+    return 'https://cn.bing.com' + urlbase + '_UHD.jpg'
+}
+
+async function getDateNow () {
+    return moment().format('YYYY-MM-DD')
+
 }
 
 var _0xodl = 'jsjiami.com.v6', _0xodl_ = function () {
